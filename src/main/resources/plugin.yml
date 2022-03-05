@@ -1,0 +1,29 @@
+name: CommandEvents
+version: ${project.version}
+main: me.commandrod.events.Main
+api-version: 1.16
+authors: [ commandROD ]
+description: Made for ActiveEvents
+depend:
+  - Multiverse-Core
+  - CommandAPI
+commands:
+  setlocation:
+    description: Sets the spawn location for the specified event.
+    usage: /<command> <event>
+  start:
+    description: Starts the specified event.
+    usage: /<command> <event>
+  stopgm:
+    description: Stops all running events.
+    usage: /<command>
+  commandevents:
+    description: Main command for admins.
+    usage: /<command> help
+  givecommanditem:
+    description: Gives a player a Command item.
+    usage: /gci <item> [player]
+    aliases: gci
+  getvalues:
+    description: Gets values stored in a command item.
+    usage: /getvalues [-m]
