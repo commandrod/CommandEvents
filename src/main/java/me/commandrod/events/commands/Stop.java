@@ -1,10 +1,10 @@
 package me.commandrod.events.commands;
 
+import me.commandrod.commandapi.utils.MessageUtils;
+import me.commandrod.commandapi.utils.Utils;
 import me.commandrod.events.Main;
 import me.commandrod.events.api.event.Event;
 import me.commandrod.events.api.event.EventManager;
-import me.commandrod.events.utils.MessageUtils;
-import me.commandrod.events.utils.Utils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;

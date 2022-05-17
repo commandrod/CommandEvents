@@ -1,11 +1,11 @@
 package me.commandrod.events.commands;
 
+import me.commandrod.commandapi.utils.MessageUtils;
+import me.commandrod.commandapi.utils.Utils;
 import me.commandrod.events.Main;
 import me.commandrod.events.api.event.Event;
 import me.commandrod.events.api.event.EventManager;
 import me.commandrod.events.api.event.EventType;
-import me.commandrod.events.utils.MessageUtils;
-import me.commandrod.events.utils.Utils;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -31,7 +31,7 @@ public class Start implements CommandExecutor, TabCompleter {
                 return true;
             }
             if (args.length == 0){
-                sender.sendMessage(MessageUtils.cmdUsage(cmd));
+                MessageUtils.cmdUsage(cmd, sender);
                 return true;
             }
             if (EventManager.isEventRunning()) {

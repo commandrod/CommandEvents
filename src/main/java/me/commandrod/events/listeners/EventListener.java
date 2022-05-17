@@ -3,6 +3,7 @@ package me.commandrod.events.listeners;
 import me.commandrod.events.Main;
 import me.commandrod.events.api.event.Event;
 import me.commandrod.events.api.event.EventManager;
+import me.commandrod.events.api.event.EventState;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.EntityType;
@@ -24,7 +25,7 @@ public class EventListener implements Listener {
     @EventHandler
     public void onClick(InventoryClickEvent e){
         if (!EventManager.isEventRunning()) return;
-        if (e.getInventory() == null) return;
+        if (e.getClickedInventory() == null) return;
         if (e.getCurrentItem() == null) return;
         Event event = Main.getEvent();
         Player p = (Player) e.getWhoClicked();
@@ -115,6 +116,7 @@ public class EventListener implements Listener {
         if (!e.getEntityType().equals(EntityType.PLAYER)) return;
         if (!e.getDamager().getType().equals(EntityType.PLAYER)) return;
         if (!EventManager.isEventRunning()) return;
+        if (!event.getEventState().equals(EventState.PLAYING)) return;
         Player p = (Player) e.getEntity();
         Player damager = (Player) e.getDamager();
         if (event.isDead(damager) || event.isDead(p)){

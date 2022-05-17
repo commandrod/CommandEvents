@@ -2,12 +2,13 @@ package me.commandrod.events.api.event;
 
 import lombok.Getter;
 import lombok.Setter;
+import me.commandrod.commandapi.utils.SoundUtils;
+import me.commandrod.commandapi.utils.Utils;
 import me.commandrod.events.Main;
 import me.commandrod.events.api.RepeatingTask;
 import me.commandrod.events.listeners.ActiveEffectListener;
 import me.commandrod.events.utils.ConfigUtils;
-import me.commandrod.events.utils.SoundUtils;
-import me.commandrod.events.utils.Utils;
+import me.commandrod.events.utils.EventUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -77,12 +78,12 @@ public abstract class Event {
                 if (countdown.get() > 0){
                     for (Player player : event.getPlayers()) {
                         if (3 >= countdown.get()) SoundUtils.playSound(player, Sound.BLOCK_NOTE_BLOCK_PLING);
-                        player.sendTitle(Utils.color("&3Starting in " + countdown), Utils.color("&b" + event.getSubtitle()), 20, 20, 20);
+                        player.showTitle(Utils.toTitle("&3Starting in " + countdown, "&b" + event.getSubtitle(), 0, 20, 0));
                     }                }
                 if (countdown.get() == 0){
                     for (Player player : event.getPlayers()){
-                        SoundUtils.playSound(player, Sound.BLOCK_NOTE_BLOCK_PLING, 2);
-                        player.sendTitle(Utils.color("&3Good luck!"), Utils.color("&bTry to be the last one standing!"), 20, 80, 20);
+                        SoundUtils.playSound(player, Sound.BLOCK_NOTE_BLOCK_PLING, 2f, 1f);
+                        player.showTitle(Utils.toTitle("&3Good luck!", "&bTry to be the last one standing!", 0, 20, 0));
                     }
                     setEventState(EventState.PLAYING);
                     onEventStart();
@@ -98,24 +99,35 @@ public abstract class Event {
     public void eliminate(Player player){
         player.setGameMode(GameMode.SPECTATOR);
         if (this.isDead(player)) return;
-        player.sendTitle(Utils.color("&cYou died!"), "", 10, 60, 10);
+        player.showTitle(Utils.toTitle("&cYou died!", "", 10, 60, 10));
         player.teleport(this.getSpawnLocation());
         this.getPlayers().remove(player);
         this.onDeath(player);
         this.getPlayers().forEach(this::sendScoreboard);
         this.end();
         if (player.getKiller() == null){
-            Bukkit.broadcastMessage(Utils.color("&c" + player.getName() + " has been eliminated."));
+            Bukkit.broadcast(Utils.color("&c" + player.getName() + " has been eliminated."));
             return;
         }
-        Bukkit.broadcastMessage(Utils.color("&c" + player.getName() + " has been killed by " + player.getKiller().getName() + "."));
+        Bukkit.broadcast(Utils.color("&c" + player.getName() + " has been killed by " + player.getKiller().getName() + "."));
+    }
+
+    public void revive(Player player){
+        this.getPlayers().add(player);
+        player.sendMessage(Utils.color("&3You have been revived."));
+        player.teleport(this.getSpawnLocation());
+        player.setGameMode(GameMode.SURVIVAL);
+        EventUtils.heal(player, false);
+        for (Player players : this.getPlayers()) {
+            this.sendScoreboard(players);
+        }
     }
 
     public void lobby(){
         this.setEventState(EventState.LOBBY);
         Bukkit.getOnlinePlayers().forEach(player -> {
             player.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
-            Utils.heal(player, true);
+            EventUtils.heal(player, true);
             player.setGameMode(GameMode.SURVIVAL);
             player.teleport(ConfigUtils.getLocation("spawn"));
         });
@@ -141,7 +153,7 @@ public abstract class Event {
             winner.teleport(ConfigUtils.getLocation("winner-location"));
 
             for (Player player : Bukkit.getOnlinePlayers()) {
-                player.sendTitle(Utils.color("&b" + winner.getName() + " won!"), Utils.color("&3GG"), 10, 80, 10);
+                player.showTitle(Utils.toTitle("&b" + winner.getName() + " won!", "&3GG", 10, 80, 10));
                 if (player == winner) continue;
                 player.teleport(ConfigUtils.getLocation("winner-view-location"));
             }
@@ -174,7 +186,7 @@ public abstract class Event {
         lines.add("&e ");
         lines.add("&eactiveevents.ml");
         for (int i = 0; i < lines.size(); i++){
-            String line = Utils.color(lines.get(i));
+            String line = Utils.legacyColor(lines.get(i));
             obj.getScore(line).setScore(lines.size() - i);
         }
         obj.setDisplaySlot(DisplaySlot.SIDEBAR);

@@ -1,8 +1,7 @@
 package me.commandrod.events.api;
 
 import lombok.Getter;
-import me.commandrod.events.api.event.Event;
-import me.commandrod.events.utils.Utils;
+import me.commandrod.commandapi.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 

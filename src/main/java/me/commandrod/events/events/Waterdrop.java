@@ -2,12 +2,12 @@ package me.commandrod.events.events;
 
 import lombok.Getter;
 import lombok.Setter;
+import me.commandrod.commandapi.utils.Utils;
 import me.commandrod.events.api.Counter;
 import me.commandrod.events.api.event.Event;
 import me.commandrod.events.api.event.EventState;
 import me.commandrod.events.api.event.EventType;
 import me.commandrod.events.utils.ConfigUtils;
-import me.commandrod.events.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -57,7 +57,7 @@ public class Waterdrop extends Event {
         for (Player player : this.getPlayers()){
             if (this.getPassedPlayers().contains(player)) continue;
             if (player.getLocation().getY() > this.getBlocks().get(0).getY() - 8) continue;
-            Bukkit.broadcastMessage(Utils.color("&7" + player.getName() + " passed!"));
+            Bukkit.broadcast(Utils.color("&7" + player.getName() + " passed!"));
             this.getPassedPlayers().add(player);
         }
         if (this.getTime() > 0) this.setTime(this.getTime() - 1);

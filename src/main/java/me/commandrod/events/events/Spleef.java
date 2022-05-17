@@ -1,14 +1,13 @@
 package me.commandrod.events.events;
 
 import lombok.Getter;
+import me.commandrod.commandapi.items.ItemUtils;
 import me.commandrod.events.api.*;
 import me.commandrod.events.api.event.Event;
 import me.commandrod.events.api.event.EventManager;
 import me.commandrod.events.api.event.EventState;
 import me.commandrod.events.api.event.EventType;
-import me.commandrod.events.utils.ItemUtils;
-import me.commandrod.events.utils.MessageUtils;
-import me.commandrod.events.utils.Utils;
+import me.commandrod.events.utils.EventUtils;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -39,7 +38,7 @@ public class Spleef extends Event {
         this.destroyedBlocks = new ArrayList<>();
         this.blocksCounter = new Counter("Blocks");
         this.snowballCounter = new Counter("Snowballs");
-        ItemStack spleefer = ItemUtils.newItem(Material.DIAMOND_SHOVEL, "&cספליפר", Arrays.asList("", "&cמה אתה עושה? תתרכז באיוונט!"), true);
+        ItemStack spleefer = ItemUtils.quickItem(Material.DIAMOND_SHOVEL, "&cספליפר", Arrays.asList("", "&cמה אתה עושה? תתרכז באיוונט!"), true);
         ItemMeta im = spleefer.getItemMeta();
         im.addEnchant(Enchantment.DIG_SPEED, 5, true);
         spleefer.setItemMeta(im);
@@ -50,7 +49,7 @@ public class Spleef extends Event {
         return Arrays.asList(
                 "&7בלוקים שהרסת: &b" + this.getBlocksCounter().getValue(player),
                 "&7כדורי שלג שזרקת: &b" + this.getSnowballCounter().getValue(player),
-                MessageUtils.border(this)
+                EventUtils.border(this)
         );
     }
 
@@ -61,7 +60,7 @@ public class Spleef extends Event {
 
     public void onEventStart() {
         this.getPlayers().forEach(player -> player.setGameMode(GameMode.SURVIVAL));
-        Utils.border(this, 3, 4);
+        EventUtils.border(this, 3, 4);
     }
 
     public boolean onBreakBlock(BlockBreakEvent event, Player breaker, Block block) {
@@ -77,9 +76,9 @@ public class Spleef extends Event {
     public void activeEffect(){
         if (!EventManager.isEventRunning()) return;
         if (this.getPlayers().size() == 0) return;
-        this.getPlayers().forEach(player -> {
+        for (Player player : this.getPlayers()){
             if (player.getLocation().getBlock().getType().equals(Material.WATER)) this.eliminate(player);
-        });
+        }
     }
 
     public void onEventEnd(Player winner) {

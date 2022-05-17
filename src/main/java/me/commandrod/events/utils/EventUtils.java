@@ -1,28 +1,18 @@
 package me.commandrod.events.utils;
 
+import me.commandrod.commandapi.utils.Utils;
 import me.commandrod.events.api.event.Event;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
 import org.bukkit.WorldBorder;
 import org.bukkit.entity.Player;
 
-import java.util.List;
-
-public class Utils {
-
-    public static String color(String s){ return ChatColor.translateAlternateColorCodes('&', s); }
+public class EventUtils {
 
     public static void heal(Player player, boolean clear){
         if (clear) player.getInventory().clear();
         player.setHealth(20);
         player.setFoodLevel(20);
         player.getActivePotionEffects().forEach(potion -> player.removePotionEffect(potion.getType()));
-    }
-
-    public static List<String> colorList(List<String> list) {
-        for (int i = 0; i < list.size(); i++){
-            list.set(i, Utils.color(list.get(i)));
-        }
-        return list;
     }
 
     public static void border(Event event, float minutes, int dmg) {
@@ -38,5 +28,13 @@ public class Utils {
 
     public static void border(Event event, float minutes) {
         border(event, minutes, 1);
+    }
+
+    public static Component NULL = Utils.color("&cNULL");
+
+    public static String border(Event event) {
+        int ogSize = (int) event.getSpawnLocation().getWorld().getWorldBorder().getSize();
+        int size = ogSize > 10000 ? 200 : ogSize;
+        return "&7בורדר: &b" + size;
     }
 }

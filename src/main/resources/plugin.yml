@@ -17,6 +17,9 @@ commands:
   stopgm:
     description: Stops all running events.
     usage: /<command>
+  revive:
+    description: Revives a specified player.
+    usage: /<command> <player>
   commandevents:
     description: Main command for admins.
     usage: /<command> help
@@ -27,3 +30,13 @@ commands:
   getvalues:
     description: Gets values stored in a command item.
     usage: /getvalues [-m]
+  updatecommanditem:
+    description: Updates a Command for all players.
+    usage: /uci <item>
+    aliases: uci
+  openshop:
+    description: Opens a Command Shop for a player.
+    usage: /openshop <shop> [player]
+  rlcf:
+    description: Reloads the configuration file.
+    usage: /rlcf

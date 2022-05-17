@@ -1,8 +1,8 @@
 package me.commandrod.events.commands;
 
+import me.commandrod.commandapi.utils.MessageUtils;
+import me.commandrod.commandapi.utils.Utils;
 import me.commandrod.events.utils.ConfigUtils;
-import me.commandrod.events.utils.MessageUtils;
-import me.commandrod.events.utils.Utils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -22,7 +22,7 @@ public class SetLocation implements CommandExecutor {
                 return true;
             }
             if (args.length == 0) {
-                p.sendMessage(MessageUtils.cmdUsage(cmd));
+                MessageUtils.cmdUsage(cmd, sender);
                 return true;
             }
             ConfigUtils.setLocation(p.getLocation(), args[0].toLowerCase());
