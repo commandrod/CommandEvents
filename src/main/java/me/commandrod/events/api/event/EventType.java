@@ -1,7 +1,6 @@
 package me.commandrod.events.api.event;
 
 public enum EventType {
-
     FFA,
     SPLEEF,
     TNTTAG,
@@ -9,5 +8,4 @@ public enum EventType {
     WATERDROP,
     PARKOUR_TAG,
     SIMON
-
 }

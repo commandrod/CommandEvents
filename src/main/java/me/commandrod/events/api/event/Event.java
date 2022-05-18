@@ -14,6 +14,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -40,19 +41,22 @@ public abstract class Event {
     private int activeEffectTime;
     private Event instance;
 
-    public Event(EventType type, String subtitle, String friendlyName, int activeEffectTime){
+    public Event(EventType type, String friendlyName, int activeEffectTime){
         this.type = type;
         this.players = new ArrayList<>();
         this.eventState = EventState.LOBBY;
-        this.subtitle = subtitle;
+        FileConfiguration config = Main.getPlugin().getConfig();
+        String eventConfigName = type.name().toLowerCase();
+        String subtitlePath = "subtitles." + eventConfigName;
+        this.subtitle = config.isSet(subtitlePath) ? config.getString(subtitlePath) : "Good luck!";
         this.friendlyName = friendlyName;
         this.activeEffectTime = activeEffectTime;
-        this.spawnLocation = ConfigUtils.getLocation(type.name().toLowerCase() + "-spawn-location");
+        this.spawnLocation = ConfigUtils.getLocation(eventConfigName + "-spawn-location");
         this.instance = this;
     }
 
-    public Event(EventType type, String subtitle, String friendlyName){
-        this(type, subtitle, friendlyName, 20);
+    public Event(EventType type, String friendlyName){
+        this(type, friendlyName, 20);
     }
 
     public void spawn() { for (Player player : this.getPlayers()) player.teleport(this.getSpawnLocation()); }
@@ -73,17 +77,18 @@ public abstract class Event {
         AtomicInteger countdown = new AtomicInteger(seconds);
         setEventState(EventState.STARTING);
         new RepeatingTask(20) {
+            final int stay = 40;
             final Event event = getInstance();
             public void run() {
                 if (countdown.get() > 0){
                     for (Player player : event.getPlayers()) {
                         if (3 >= countdown.get()) SoundUtils.playSound(player, Sound.BLOCK_NOTE_BLOCK_PLING);
-                        player.showTitle(Utils.toTitle("&3Starting in " + countdown, "&b" + event.getSubtitle(), 0, 20, 0));
+                        player.showTitle(Utils.toTitle("&3Starting in " + countdown, "&b" + event.getSubtitle(), 0, stay, 0));
                     }                }
                 if (countdown.get() == 0){
                     for (Player player : event.getPlayers()){
                         SoundUtils.playSound(player, Sound.BLOCK_NOTE_BLOCK_PLING, 2f, 1f);
-                        player.showTitle(Utils.toTitle("&3Good luck!", "&bTry to be the last one standing!", 0, 20, 0));
+                        player.showTitle(Utils.toTitle("&3Good luck!", "&bTry to be the last one standing!", 0, stay, 20));
                     }
                     setEventState(EventState.PLAYING);
                     onEventStart();
@@ -100,9 +105,9 @@ public abstract class Event {
         player.setGameMode(GameMode.SPECTATOR);
         if (this.isDead(player)) return;
         player.showTitle(Utils.toTitle("&cYou died!", "", 10, 60, 10));
-        player.teleport(this.getSpawnLocation());
         this.getPlayers().remove(player);
         this.onDeath(player);
+        player.teleport(this.getSpawnLocation());
         this.getPlayers().forEach(this::sendScoreboard);
         this.end();
         if (player.getKiller() == null){
@@ -190,7 +195,6 @@ public abstract class Event {
             obj.getScore(line).setScore(lines.size() - i);
         }
         obj.setDisplaySlot(DisplaySlot.SIDEBAR);
-        this.onScoreboardUpdate(scoreboard, player);
         player.setScoreboard(scoreboard);
     }
 
@@ -201,7 +205,6 @@ public abstract class Event {
     public abstract void onEventEnd(Player winner);
     public abstract void onDeath(Player player);
     public abstract void onRespawn(Player player);
-    public abstract void onScoreboardUpdate(Scoreboard scoreboard, Player player);
     public abstract boolean onBreakBlock(BlockBreakEvent event, Player breaker, Block block);
     public abstract boolean onPlaceBlock(BlockPlaceEvent event, Player placer, Block block, Block replacedBlock);
     public abstract boolean onDamageByPlayer(Player attacker, Player damaged);

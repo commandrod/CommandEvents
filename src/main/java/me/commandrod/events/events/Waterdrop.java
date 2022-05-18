@@ -18,7 +18,6 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scoreboard.Scoreboard;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,7 +36,7 @@ public class Waterdrop extends Event {
     private boolean roundRunning;
 
     public Waterdrop() {
-        super(EventType.WATERDROP, "Built by: ronii, ItzDuck_", "קפיצה למים");
+        super(EventType.WATERDROP, "קפיצה למים");
         this.round = 0;
         this.time = this.defaultTime;
         this.furthestRoundCounter = new Counter("Furthest Round Reached");
@@ -119,7 +118,6 @@ public class Waterdrop extends Event {
     public void preEventStart() { }
     public void onDeath(Player player) { this.getFurthestRoundCounter().set(player, this.getRound()); }
     public void onRespawn(Player player) { }
-    public void onScoreboardUpdate(Scoreboard scoreboard, Player player) { }
     public boolean onBreakBlock(BlockBreakEvent event, Player breaker, Block block) { return true; }
     public boolean onPlaceBlock(BlockPlaceEvent event, Player placer, Block block, Block replacedBlock) { return true; }
     public boolean onDamageByPlayer(Player attacker, Player damaged) { return true; }

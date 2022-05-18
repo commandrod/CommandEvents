@@ -3,7 +3,6 @@ package me.commandrod.events.events;
 import lombok.Getter;
 import me.commandrod.commandapi.items.CommandItem;
 import me.commandrod.commandapi.items.ItemUtils;
-import me.commandrod.commandapi.utils.MessageUtils;
 import me.commandrod.events.api.Counter;
 import me.commandrod.events.api.event.Event;
 import me.commandrod.events.api.event.EventState;
@@ -17,7 +16,6 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.scoreboard.Scoreboard;
 
 import java.util.Arrays;
 import java.util.List;
@@ -28,7 +26,7 @@ public class FFA extends Event {
     private final Counter killsCounter;
 
     public FFA() {
-        super(EventType.FFA, "Built by: ronii", "השורד האחרון");
+        super(EventType.FFA, "השורד האחרון");
         this.killsCounter = new Counter("Kills");
     }
 
@@ -41,8 +39,9 @@ public class FFA extends Event {
 
     public void preEventStart() {
         this.getPlayers().forEach(player -> {
-            player.getInventory().setItem(0, new ItemStack(Material.DIAMOND_SWORD));
-            player.getInventory().setItem(1, new ItemStack(Material.COOKED_BEEF, 4));
+            player.getInventory().setItemInMainHand(new ItemStack(Material.DIAMOND_AXE));
+            player.getInventory().setItemInOffHand(new ItemStack(Material.SHIELD));
+            player.getInventory().addItem(new ItemStack(Material.COOKED_BEEF, 4));
             player.getInventory().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
             player.getInventory().setChestplate(new ItemStack(Material.DIAMOND_CHESTPLATE));
             player.getInventory().setLeggings(new ItemStack(Material.DIAMOND_LEGGINGS));
@@ -72,7 +71,6 @@ public class FFA extends Event {
     }
 
     public void activeEffect() {}
-    public void onScoreboardUpdate(Scoreboard scoreboard, Player player) { }
     public void onRespawn(Player player) { }
     public boolean onBreakBlock(BlockBreakEvent event, Player breaker, Block block) { return true; }
     public boolean onPlaceBlock(BlockPlaceEvent event, Player placer, Block block, Block replacedBlock) { return true; }

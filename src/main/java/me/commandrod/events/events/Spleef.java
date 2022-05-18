@@ -2,7 +2,7 @@ package me.commandrod.events.events;
 
 import lombok.Getter;
 import me.commandrod.commandapi.items.ItemUtils;
-import me.commandrod.events.api.*;
+import me.commandrod.events.api.Counter;
 import me.commandrod.events.api.event.Event;
 import me.commandrod.events.api.event.EventManager;
 import me.commandrod.events.api.event.EventState;
@@ -19,7 +19,6 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.scoreboard.Scoreboard;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,13 +27,13 @@ import java.util.List;
 @Getter
 public class Spleef extends Event {
 
-    private final ItemStack spleefer;
+    private final ItemStack spleefShovel;
     private final List<Block> destroyedBlocks;
     private final Counter blocksCounter;
     private final Counter snowballCounter;
 
     public Spleef() {
-        super(EventType.SPLEEF, "Built by: L1dor", "ספליף");
+        super(EventType.SPLEEF, "ספליף");
         this.destroyedBlocks = new ArrayList<>();
         this.blocksCounter = new Counter("Blocks");
         this.snowballCounter = new Counter("Snowballs");
@@ -42,7 +41,7 @@ public class Spleef extends Event {
         ItemMeta im = spleefer.getItemMeta();
         im.addEnchant(Enchantment.DIG_SPEED, 5, true);
         spleefer.setItemMeta(im);
-        this.spleefer = spleefer;
+        this.spleefShovel = spleefer;
     }
 
     public List<String> getLines(Player player){
@@ -54,7 +53,7 @@ public class Spleef extends Event {
     }
 
     public void preEventStart() {
-        this.getPlayers().forEach(player -> player.getInventory().addItem(getSpleefer()));
+        this.getPlayers().forEach(player -> player.getInventory().addItem(getSpleefShovel()));
         this.getSpawnLocation().getWorld().getWorldBorder().reset();
     }
 
@@ -90,7 +89,6 @@ public class Spleef extends Event {
 
     public void onDeath(Player player) { }
     public void onRespawn(Player player) { }
-    public void onScoreboardUpdate(Scoreboard scoreboard, Player player) { }
     public boolean onPlaceBlock(BlockPlaceEvent event, Player placer, Block block, Block replacedBlock) { return true; }
     public boolean onDamageByPlayer(Player attacker, Player damaged) { return true; }
     public boolean onDamage(Player player, EntityDamageEvent event) { return event.getCause().equals(EntityDamageEvent.DamageCause.FALL); }

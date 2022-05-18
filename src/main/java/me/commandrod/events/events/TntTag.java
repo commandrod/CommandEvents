@@ -17,12 +17,12 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.scoreboard.Scoreboard;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 public class TntTag extends Event {
 
@@ -35,9 +35,9 @@ public class TntTag extends Event {
     private ItemStack tnt(){ return ItemUtils.quickItem(Material.TNT, "&cאתה התופס!", null, false); }
 
     public TntTag() {
-        super(EventType.TNTTAG, "Built by: L1dor", "התופס המתפוצץ");
+        super(EventType.TNTTAG, "התופס המתפוצץ");
         this.taggers = new ArrayList<>();
-        this.cooldownManager = new CommandCooldown(.3f);
+        this.cooldownManager = new CommandCooldown(.3f, false);
         this.time = defaultTime;
     }
 
@@ -52,13 +52,14 @@ public class TntTag extends Event {
     public void activeEffect() {
         if (this.time > 0) this.time--;
         if (this.time != 0) return;
-        eliminateTaggers();
-        randomTag();
+        for (Player player : this.getPlayers().stream().filter(this.taggers::contains).collect(Collectors.toList()))
+            this.eliminate(player);
+        this.randomTag();
     }
 
     public void preEventStart() { for (Player player : this.getPlayers()) player.setGameMode(GameMode.ADVENTURE); }
 
-    public void onEventStart() { randomTag(); }
+    public void onEventStart() { this.randomTag(); }
 
     public void onEventEnd(Player winner) { this.taggers.clear(); }
 
@@ -66,38 +67,30 @@ public class TntTag extends Event {
         if (!this.taggers.contains(attacker)) return true;
         if (this.taggers.contains(damaged)) return true;
         if (!this.cooldownManager.call(attacker) || !this.cooldownManager.call(damaged)) return true;
-        tag(damaged, attacker);
-        untag(attacker);
+        this.tag(damaged, attacker);
+        this.untag(attacker);
         return true;
     }
 
     public void onDeath(Player player) {
         if (!this.taggers.contains(player)) return;
-        untag(player);
+        this.untag(player);
         player.getLocation().createExplosion(4f, false, false);
-        this.taggers.remove(player);
-        if (!this.getEventState().equals(EventState.PLAYING)) return;
-        if (this.taggers.size() == 0) randomTag();
     }
 
-    private void eliminateTaggers(){ this.taggers.forEach(this::eliminate); }
-
     private void randomTag(){
+        if (!this.getEventState().equals(EventState.PLAYING)) return;
+        this.time = this.defaultTime;
+        int amount = Math.floorDiv(this.getPlayers().size(), 3);
+        int finalAmount = Math.max(amount, 1);
         Bukkit.getScheduler().runTaskLater(Main.getPlugin(), () -> {
-            if (!this.getEventState().equals(EventState.PLAYING)) return;
-            this.time = this.defaultTime;
-            Random rand = new Random();
-            int amount = Integer.divideUnsigned(this.getPlayers().size(), 3);
-            int finalAmount = Math.max(amount, 1);
-            for (int i = 0; i < finalAmount; i++){
-                Player player = this.getPlayers().get(rand.nextInt(amount + 1));
-                if (this.taggers.contains(player)){
-                    i--;
-                    continue;
-                }
-                this.tag(player, null);
-            }
-        }, 80);
+        for (int i = 0; i < finalAmount; i++){
+            List<Player> filtered = this.getPlayers().stream()
+                    .filter(p -> !this.taggers.contains(p))
+                    .collect(Collectors.toList());
+            Player player = filtered.get(ThreadLocalRandom.current().nextInt(this.getPlayers().size() - 1));
+            this.tag(player, null);
+        }}, 50);
     }
 
     private void untag(Player player){
@@ -119,7 +112,6 @@ public class TntTag extends Event {
         Bukkit.broadcast(Utils.color("&7" + player.getName() + " has been tagged by " + attacker.getName() + "!"));
     }
 
-    public void onScoreboardUpdate(Scoreboard scoreboard, Player player) { }
     public void onRespawn(Player player) { }
     public boolean onBreakBlock(BlockBreakEvent event, Player breaker, Block block) { return true; }
     public boolean onPlaceBlock(BlockPlaceEvent event, Player placer, Block block, Block replacedBlock) { return true; }

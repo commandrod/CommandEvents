@@ -36,8 +36,9 @@ public final class Main extends JavaPlugin {
         plugin = this;
 
         this.getCommand("setlocation").setExecutor(new SetLocation());
-        this.getCommand("start").setExecutor(new Start());
-        this.getCommand("start").setTabCompleter(new Start());
+        final Start start = new Start();
+        this.getCommand("start").setExecutor(start);
+        this.getCommand("start").setTabCompleter(start);
         this.getCommand("stopgm").setExecutor(new Stop());
         this.getCommand("commandevents").setExecutor(new Admin());
         this.getCommand("revive").setExecutor(new Revive());

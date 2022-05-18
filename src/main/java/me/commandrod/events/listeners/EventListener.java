@@ -63,7 +63,6 @@ public class EventListener implements Listener {
         Player p = e.getPlayer();
         Event event = Main.getEvent();
         event.eliminate(p);
-        event.onDeath(p);
         event.end();
     }
 
