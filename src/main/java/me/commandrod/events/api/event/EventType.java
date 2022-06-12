@@ -6,6 +6,7 @@ public enum EventType {
     TNTTAG,
     TNTRUN,
     WATERDROP,
-    PARKOUR_TAG,
-    SIMON
+    PARKOURTAG,
+    SIMON,
+    SNOWDODGE
 }

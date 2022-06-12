@@ -1,8 +1,6 @@
 package me.commandrod.events.utils;
 
-import me.commandrod.commandapi.utils.Utils;
 import me.commandrod.events.api.event.Event;
-import net.kyori.adventure.text.Component;
 import org.bukkit.WorldBorder;
 import org.bukkit.entity.Player;
 
@@ -30,7 +28,7 @@ public class EventUtils {
         border(event, minutes, 1);
     }
 
-    public static Component NULL = Utils.color("&cNULL");
+    public static String NULL = "&cNULL";
 
     public static String border(Event event) {
         int ogSize = (int) event.getSpawnLocation().getWorld().getWorldBorder().getSize();

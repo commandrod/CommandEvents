@@ -19,8 +19,7 @@ public class SpleefListener implements Listener {
         if (!EventManager.isEventRunning()) return;
         if (!Main.getEvent().getType().equals(EventType.SPLEEF)) return;
         Spleef event = (Spleef) Main.getEvent();
-        if (!(e.getEntity().getShooter() instanceof Player)) return;
-        Player p = (Player) e.getEntity().getShooter();
+        if (!(e.getEntity().getShooter() instanceof Player p)) return;
         event.getSnowballCounter().add(p);
     }
 
@@ -32,8 +31,7 @@ public class SpleefListener implements Listener {
         Block block = e.getHitBlock();
         if (block == null) return;
         if (!block.getType().equals(Material.SNOW_BLOCK)) return;
-        if (!(e.getEntity().getShooter() instanceof Player)) return;
-        Player p = (Player) e.getEntity().getShooter();
+        if (!(e.getEntity().getShooter() instanceof Player p)) return;
         block.setType(Material.AIR);
         event.getDestroyedBlocks().add(block);
         event.getBlocksCounter().add(p);

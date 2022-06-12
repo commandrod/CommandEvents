@@ -2,12 +2,14 @@ package me.commandrod.events.api.event;
 
 import lombok.Getter;
 import lombok.Setter;
+import me.commandrod.commandapi.CommandAPI;
+import me.commandrod.commandapi.utils.ConfigUtils;
+import me.commandrod.commandapi.utils.MessageUtils;
 import me.commandrod.commandapi.utils.SoundUtils;
 import me.commandrod.commandapi.utils.Utils;
 import me.commandrod.events.Main;
 import me.commandrod.events.api.RepeatingTask;
 import me.commandrod.events.listeners.ActiveEffectListener;
-import me.commandrod.events.utils.ConfigUtils;
 import me.commandrod.events.utils.EventUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -27,6 +29,7 @@ import org.bukkit.scoreboard.Scoreboard;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Getter @Setter
@@ -51,50 +54,58 @@ public abstract class Event {
         this.subtitle = config.isSet(subtitlePath) ? config.getString(subtitlePath) : "Good luck!";
         this.friendlyName = friendlyName;
         this.activeEffectTime = activeEffectTime;
-        this.spawnLocation = ConfigUtils.getLocation(eventConfigName + "-spawn-location");
         this.instance = this;
+        Optional<Location> opSpawn = ConfigUtils.getInstance().getLocation(eventConfigName + "-spawn-location");
+        if (opSpawn.isEmpty()) {
+            Main.getPlugin().getLogger().severe("Error getting spawn location for " + eventConfigName + "!");
+            return;
+        }
+        this.spawnLocation = opSpawn.get();
     }
 
     public Event(EventType type, String friendlyName){
         this(type, friendlyName, 20);
     }
 
-    public void spawn() { for (Player player : this.getPlayers()) player.teleport(this.getSpawnLocation()); }
+    public void spawn() {
+        for (Player player : this.players) player.teleport(this.spawnLocation);
+    }
 
     public void countdown(int seconds) {
-        if (this.getSpawnLocation() == null){
+        if (this.spawnLocation == null){
             Bukkit.broadcast(Utils.color("&cAn error has occurred while trying to start this event!"), "commandevents.admin");
             return;
         }
         for (Player player : Bukkit.getOnlinePlayers()) {
-            player.teleport(this.getSpawnLocation());
+            player.teleport(this.spawnLocation);
             if (player.getGameMode().equals(GameMode.CREATIVE) || player.getGameMode().equals(GameMode.SPECTATOR)) continue;
-            this.getPlayers().add(player);
+            this.players.add(player);
             this.sendScoreboard(player);
             player.setGameMode(GameMode.ADVENTURE);
         }
-        preEventStart();
+        this.preEventStart();
         AtomicInteger countdown = new AtomicInteger(seconds);
-        setEventState(EventState.STARTING);
+        this.eventState  = EventState.STARTING;
         new RepeatingTask(20) {
             final int stay = 40;
             final Event event = getInstance();
             public void run() {
                 if (countdown.get() > 0){
-                    for (Player player : event.getPlayers()) {
+                    for (Player player : event.players) {
                         if (3 >= countdown.get()) SoundUtils.playSound(player, Sound.BLOCK_NOTE_BLOCK_PLING);
                         player.showTitle(Utils.toTitle("&3Starting in " + countdown, "&b" + event.getSubtitle(), 0, stay, 0));
-                    }                }
+                    }
+                }
                 if (countdown.get() == 0){
-                    for (Player player : event.getPlayers()){
+                    for (Player player : event.players){
                         SoundUtils.playSound(player, Sound.BLOCK_NOTE_BLOCK_PLING, 2f, 1f);
                         player.showTitle(Utils.toTitle("&3Good luck!", "&bTry to be the last one standing!", 0, stay, 20));
                     }
-                    setEventState(EventState.PLAYING);
-                    onEventStart();
-                    this.cancel();
+                    event.setEventState(EventState.PLAYING);
+                    event.onEventStart();
                     ActiveEffectListener listener = new ActiveEffectListener(event);
                     Bukkit.getScheduler().scheduleSyncRepeatingTask(Main.getPlugin(), listener, 0, listener.getTime());
+                    this.cancel();
                 }
                 countdown.getAndDecrement();
             }
@@ -105,25 +116,25 @@ public abstract class Event {
         player.setGameMode(GameMode.SPECTATOR);
         if (this.isDead(player)) return;
         player.showTitle(Utils.toTitle("&cYou died!", "", 10, 60, 10));
-        this.getPlayers().remove(player);
+        this.players.remove(player);
         this.onDeath(player);
-        player.teleport(this.getSpawnLocation());
-        this.getPlayers().forEach(this::sendScoreboard);
+        player.teleport(this.spawnLocation);
+        this.players.forEach(this::sendScoreboard);
         this.end();
         if (player.getKiller() == null){
-            Bukkit.broadcast(Utils.color("&c" + player.getName() + " has been eliminated."));
+            Bukkit.broadcast(Utils.color("&b" + player.getName() + " &fhas been eliminated."));
             return;
         }
-        Bukkit.broadcast(Utils.color("&c" + player.getName() + " has been killed by " + player.getKiller().getName() + "."));
+        Bukkit.broadcast(Utils.color("&b" + player.getName() + " &fhas been eliminated by &b" + player.getKiller().getName() + "&f."));
     }
 
     public void revive(Player player){
-        this.getPlayers().add(player);
+        this.players.add(player);
         player.sendMessage(Utils.color("&3You have been revived."));
-        player.teleport(this.getSpawnLocation());
+        player.teleport(this.spawnLocation);
         player.setGameMode(GameMode.SURVIVAL);
         EventUtils.heal(player, false);
-        for (Player players : this.getPlayers()) {
+        for (Player players : this.players) {
             this.sendScoreboard(players);
         }
     }
@@ -134,7 +145,9 @@ public abstract class Event {
             player.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
             EventUtils.heal(player, true);
             player.setGameMode(GameMode.SURVIVAL);
-            player.teleport(ConfigUtils.getLocation("spawn"));
+            Optional<Location> opSpawn = ConfigUtils.getInstance().getLocation("spawn");
+            opSpawn.ifPresentOrElse(player::teleport,
+                    () -> player.sendMessage(Utils.color(MessageUtils.ERROR_ADMIN)));
         });
     }
 
@@ -144,8 +157,8 @@ public abstract class Event {
     }
 
     public void end() {
-        if (this.getPlayers().size() != 1) return;
-        this.winner(this.getPlayers().get(0));
+        if (this.players.size() != 1) return;
+        this.winner(this.players.get(0));
     }
 
     public void winner(Player winner) {
@@ -155,12 +168,16 @@ public abstract class Event {
             Bukkit.broadcast(Utils.color("&3Winner: &b\n" + winner.getName()), "commandevents.admin");
             this.lobby();
             this.onEventEnd(winner);
-            winner.teleport(ConfigUtils.getLocation("winner-location"));
+            Optional<Location> opWinner = ConfigUtils.getInstance().getLocation("winner-location");
+            opWinner.ifPresentOrElse(winner::teleport,
+                    () -> winner.sendMessage(Utils.color(MessageUtils.ERROR_ADMIN)));
 
             for (Player player : Bukkit.getOnlinePlayers()) {
                 player.showTitle(Utils.toTitle("&b" + winner.getName() + " won!", "&3GG", 10, 80, 10));
                 if (player == winner) continue;
-                player.teleport(ConfigUtils.getLocation("winner-view-location"));
+                Optional<Location> opWinnerView = ConfigUtils.getInstance().getLocation("winner-view-location");
+                opWinnerView.ifPresentOrElse(player::teleport,
+                        () -> player.sendMessage(Utils.color(MessageUtils.ERROR_ADMIN)));
             }
 
             AtomicInteger count = new AtomicInteger(20);
@@ -177,7 +194,7 @@ public abstract class Event {
     }
 
     public boolean isDead(Player player) {
-        return !this.getPlayers().contains(player);
+        return !this.players.contains(player);
     }
 
     public void sendScoreboard(Player player) {
@@ -187,9 +204,9 @@ public abstract class Event {
         lines.add("&b" + this.getFriendlyName());
         lines.add("&7 ");
         if (this.getLines(player) != null) lines.addAll(this.getLines(player));
-        lines.add("&7שחקנים שנשארו: &b" + this.getPlayers().size());
+        lines.add("&7שחקנים שנשארו: &b" + this.players.size());
         lines.add("&e ");
-        lines.add("&eactiveevents.ml");
+        lines.add("&eActiveEvents.club");
         for (int i = 0; i < lines.size(); i++){
             String line = Utils.legacyColor(lines.get(i));
             obj.getScore(line).setScore(lines.size() - i);

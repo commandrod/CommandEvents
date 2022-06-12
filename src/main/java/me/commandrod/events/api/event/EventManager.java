@@ -29,6 +29,5 @@ public class EventManager {
         Event event = Main.getEvent();
         if (event == null) return false;
         return !event.getEventState().equals(EventState.LOBBY);
-        //return !(event.getEventState().equals(EventState.LOBBY) || event.getEventState().equals(EventState.ENDING));
     }
 }

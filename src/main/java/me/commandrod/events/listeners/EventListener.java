@@ -1,9 +1,11 @@
 package me.commandrod.events.listeners;
 
+import me.commandrod.commandapi.utils.Utils;
 import me.commandrod.events.Main;
 import me.commandrod.events.api.event.Event;
 import me.commandrod.events.api.event.EventManager;
 import me.commandrod.events.api.event.EventState;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.EntityType;
@@ -25,10 +27,11 @@ public class EventListener implements Listener {
     @EventHandler
     public void onClick(InventoryClickEvent e){
         if (!EventManager.isEventRunning()) return;
+        if (!(e.getWhoClicked() instanceof Player p)) return;
         if (e.getClickedInventory() == null) return;
+        if (e.getClickedInventory().equals(p.getInventory())) return;
         if (e.getCurrentItem() == null) return;
         Event event = Main.getEvent();
-        Player p = (Player) e.getWhoClicked();
         if (event.isDead(p)){
             if (p.hasPermission("commandevents.bypass")){
                 e.setCancelled(false);
@@ -45,7 +48,7 @@ public class EventListener implements Listener {
         if (!EventManager.isEventRunning()) return;
         Event event = Main.getEvent();
         Player p = e.getPlayer();
-        if (p.hasPermission("commandevents.bypass")) return;
+        if (!event.isDead(p)) return;
         p.teleport(event.getSpawnLocation());
         p.setGameMode(GameMode.SPECTATOR);
         event.eliminate(p);
@@ -81,16 +84,16 @@ public class EventListener implements Listener {
         Player p = e.getPlayer();
         if (!EventManager.isEventRunning()) return;
         Event event = Main.getEvent();
-        if (event.isDead(p)){
-            if (p.hasPermission("commandevents.bypass")){
-                e.setCancelled(false);
-                return;
-            }
-            e.setCancelled(true);
-            return;
-        }
+//        if (event.isDead(p)){
+//            if (p.hasPermission("commandevents.bypass")){
+//                e.setCancelled(false);
+//                return;
+//            }
+//            e.setCancelled(true);
+//            return;
+//        }
         e.setDropItems(false);
-        e.setCancelled(event.onBreakBlock(e, e.getPlayer(), e.getBlock()));
+        e.setCancelled(event.onBreakBlock(e, p, e.getBlock()));
     }
 
     @EventHandler(priority = EventPriority.HIGH)
@@ -98,42 +101,43 @@ public class EventListener implements Listener {
         Player p = e.getPlayer();
         if (!EventManager.isEventRunning()) return;
         Event event = Main.getEvent();
-        if (event.isDead(p)){
-            if (p.hasPermission("commandevents.bypass")){
-                e.setCancelled(false);
-                return;
-            }
-            e.setCancelled(true);
-            return;
-        }
-        e.setCancelled(event.onPlaceBlock(e, e.getPlayer(), e.getBlock(), e.getBlockReplacedState().getBlock()));
+//        if (event.isDead(p)){
+//            if (p.hasPermission("commandevents.bypass")){
+//                e.setCancelled(false);
+//                return;
+//            }
+//            e.setCancelled(true);
+//            return;
+//        }
+        e.setCancelled(event.onPlaceBlock(e, p, e.getBlock(), e.getBlockReplacedState().getBlock()));
     }
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onAttack(EntityDamageByEntityEvent e) {
         Event event = Main.getEvent();
-        if (!e.getEntityType().equals(EntityType.PLAYER)) return;
-        if (!e.getDamager().getType().equals(EntityType.PLAYER)) return;
+        if (!(e.getEntity() instanceof Player p)) return;
+        if (!(e.getDamager() instanceof Player damager)) return;
         if (!EventManager.isEventRunning()) return;
-        if (!event.getEventState().equals(EventState.PLAYING)) return;
-        Player p = (Player) e.getEntity();
-        Player damager = (Player) e.getDamager();
-        if (event.isDead(damager) || event.isDead(p)){
-            if (damager.hasPermission("commandevents.bypass")){
-                e.setCancelled(false);
+        if (event.getEventState().equals(EventState.PLAYING)) {
+            if (event.isDead(p)) {
+                e.setCancelled(true);
                 return;
             }
-            e.setCancelled(true);
+            e.setCancelled(event.onDamageByPlayer(damager, p));
             return;
         }
-        e.setCancelled(event.onDamageByPlayer(damager, p));
+        e.setCancelled(true);
     }
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onDamage(EntityDamageEvent e) {
+        if (!EventManager.isEventRunning()) return;
         if (!e.getEntityType().equals(EntityType.PLAYER)) return;
         if (e.getCause().name().contains("ENTITY")) return;
-        if (!EventManager.isEventRunning()) return;
+        if (e.getCause().equals(EntityDamageEvent.DamageCause.CUSTOM) || e.getCause().equals((EntityDamageEvent.DamageCause.VOID))){
+            e.setCancelled(false);
+            return;
+        }
         Player p = (Player) e.getEntity();
         Event event = Main.getEvent();
         if (event.isDead(p)) {
@@ -154,7 +158,7 @@ public class EventListener implements Listener {
         if (!EventManager.isEventRunning()) return;
         Player p = e.getEntity();
         Event event = Main.getEvent();
-        e.setDeathMessage("");
+        e.deathMessage(Component.empty());
         e.getDrops().clear();
         event.eliminate(p);
 

@@ -1,5 +1,9 @@
 package me.commandrod.events.commands;
 
+import cloud.commandframework.annotations.Argument;
+import cloud.commandframework.annotations.CommandDescription;
+import cloud.commandframework.annotations.CommandMethod;
+import cloud.commandframework.annotations.CommandPermission;
 import me.commandrod.commandapi.utils.MessageUtils;
 import me.commandrod.commandapi.utils.Utils;
 import me.commandrod.events.Main;
@@ -83,4 +87,33 @@ public class Start implements CommandExecutor, TabCompleter {
         }
         return Collections.EMPTY_LIST;
     }
+
+//    @CommandMethod("start <type> <time>")
+//    @CommandPermission("active.start")
+//    @CommandDescription("Starts the specified event.")
+//    public void start(CommandSender sender, @Argument("type") EventType eventType, @Argument("time") int seconds) {
+//        if (EventManager.isEventRunning()) {
+//            sender.sendMessage(Utils.color("&cThere is a running event!"));
+//            return;
+//        }
+//        Collection<Player> readyPlayers = Bukkit.getOnlinePlayers().stream().filter(player -> player.getGameMode().equals(GameMode.SURVIVAL) || player.getGameMode().equals(GameMode.ADVENTURE)).collect(Collectors.toList());
+//        if (readyPlayers.size() < 2){
+//            sender.sendMessage(Utils.color("&cThere are not enough online players!"));
+//            return;
+//        }
+//        Main.setEvent(EventManager.getEvent(eventType));
+//        Event event = Main.getEvent();
+//        if (event.getSpawnLocation() == null){
+//            sender.sendMessage(Utils.color("&cThe start location of this event is invalid!"));
+//            return;
+//        }
+//        event.countdown(seconds);
+//        sender.sendMessage(Utils.color("&3Successfully started the event &b" + eventType.name() + "&3."));
+//    }
+//
+//    @CommandMethod("start <type>")
+//    @CommandPermission("active.start")
+//    public void startNoTime(CommandSender sender, @Argument("type") EventType eventType) {
+//        start(sender, eventType, 15);
+//    }
 }

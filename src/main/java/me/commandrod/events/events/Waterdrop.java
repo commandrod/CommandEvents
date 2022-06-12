@@ -2,13 +2,17 @@ package me.commandrod.events.events;
 
 import lombok.Getter;
 import lombok.Setter;
+import me.commandrod.commandapi.CommandAPI;
+import me.commandrod.commandapi.utils.ConfigUtils;
 import me.commandrod.commandapi.utils.Utils;
+import me.commandrod.events.Main;
 import me.commandrod.events.api.Counter;
 import me.commandrod.events.api.event.Event;
 import me.commandrod.events.api.event.EventState;
 import me.commandrod.events.api.event.EventType;
-import me.commandrod.events.utils.ConfigUtils;
+import me.commandrod.events.utils.EventUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -19,10 +23,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 @Getter @Setter
 public class Waterdrop extends Event {
@@ -41,8 +42,14 @@ public class Waterdrop extends Event {
         this.time = this.defaultTime;
         this.furthestRoundCounter = new Counter("Furthest Round Reached");
         this.passedPlayers = new ArrayList<>();
-        this.blocks = ConfigUtils.getBlocksBetween(ConfigUtils.getLocation("waterdrop-blocks-1"), ConfigUtils.getLocation("waterdrop-blocks-2"));
         this.roundRunning = false;
+        Optional<Location> opBlocks1 = ConfigUtils.getInstance().getLocation("waterdrop-blocks-1");
+        Optional<Location> opBlocks2 = ConfigUtils.getInstance().getLocation("waterdrop-blocks-2");
+        if (opBlocks1.isEmpty() || opBlocks2.isEmpty()) {
+            Main.getPlugin().getLogger().severe("Error getting blocks for waterdrop!");
+            return;
+        }
+        this.blocks = ConfigUtils.getInstance().getBlocksBetween(opBlocks1.get(), opBlocks2.get());
     }
 
     public List<String> getLines(Player player) {

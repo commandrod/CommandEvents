@@ -84,7 +84,7 @@ public class TntTag extends Event {
         int amount = Math.floorDiv(this.getPlayers().size(), 3);
         int finalAmount = Math.max(amount, 1);
         Bukkit.getScheduler().runTaskLater(Main.getPlugin(), () -> {
-        for (int i = 0; i < finalAmount; i++){
+            for (int i = 0; i < finalAmount; i++){
             List<Player> filtered = this.getPlayers().stream()
                     .filter(p -> !this.taggers.contains(p))
                     .collect(Collectors.toList());
@@ -116,5 +116,5 @@ public class TntTag extends Event {
     public boolean onBreakBlock(BlockBreakEvent event, Player breaker, Block block) { return true; }
     public boolean onPlaceBlock(BlockPlaceEvent event, Player placer, Block block, Block replacedBlock) { return true; }
     public boolean onDamage(Player attacker, EntityDamageEvent event) { return true; }
-    public boolean onInventoryClick(Player clicker, InventoryClickEvent event) { return false; }
+    public boolean onInventoryClick(Player clicker, InventoryClickEvent event) { return true; }
 }

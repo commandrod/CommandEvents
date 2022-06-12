@@ -5,6 +5,7 @@ import lombok.Setter;
 import me.commandrod.events.api.event.Event;
 import me.commandrod.events.api.event.EventType;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -24,6 +25,7 @@ public class Simon extends Event {
         super(EventType.SIMON, "המלך אמר", 12000);
     }
 
+    @Setter
     private Player king;
     @Getter @Setter
     private boolean isPvP = false;
@@ -60,7 +62,7 @@ public class Simon extends Event {
     }
 
     private boolean canBuild(Player player) {
-        return !(player.hasPermission("active.admin") || this.king.getUniqueId() == player.getUniqueId());
+        return !(this.king.equals(player) || player.getGameMode().equals(GameMode.CREATIVE));
     }
 
     public void activeEffect() { }

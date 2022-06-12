@@ -5,24 +5,9 @@ api-version: 1.16
 authors: [ commandROD ]
 description: Made for ActiveEvents
 depend:
+  - ActiveEvents
   - Multiverse-Core
-  - CommandAPI
 commands:
-  setlocation:
-    description: Sets the spawn location for the specified event.
-    usage: /<command> <event>
-  start:
-    description: Starts the specified event.
-    usage: /<command> <event>
-  stopgm:
-    description: Stops all running events.
-    usage: /<command>
-  revive:
-    description: Revives a specified player.
-    usage: /<command> <player>
-  commandevents:
-    description: Main command for admins.
-    usage: /<command> help
   givecommanditem:
     description: Gives a player a Command item.
     usage: /gci <item> [player]
@@ -40,3 +25,4 @@ commands:
   rlcf:
     description: Reloads the configuration file.
     usage: /rlcf
+  start:

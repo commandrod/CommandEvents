@@ -1,5 +1,7 @@
 package me.commandrod.events;
 
+import cloud.commandframework.annotations.AnnotationParser;
+import cloud.commandframework.annotations.CommandMethod;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
@@ -8,11 +10,15 @@ import me.commandrod.events.api.event.Event;
 import me.commandrod.events.api.event.EventManager;
 import me.commandrod.events.api.event.EventType;
 import me.commandrod.events.commands.*;
+import me.commandrod.events.customlisteners.SnowDodgeListener;
 import me.commandrod.events.customlisteners.SpleefListener;
+import me.commandrod.events.events.SnowDodge;
 import me.commandrod.events.listeners.EventListener;
 import org.bukkit.Bukkit;
 import org.bukkit.GameRule;
 import org.bukkit.World;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.reflections.Reflections;
 
@@ -28,20 +34,18 @@ public final class Main extends JavaPlugin {
     @SneakyThrows
     public void onEnable() {
         this.saveDefaultConfig();
+        plugin = this;
 
         api = new CommandAPI(this, "active");
         api.registerItems("me.commandrod.events.items");
         api.registerCommands();
 
-        plugin = this;
+        AnnotationParser<CommandSender> annotationParser = api.setupAnnotationCommands();
 
-        this.getCommand("setlocation").setExecutor(new SetLocation());
-        final Start start = new Start();
-        this.getCommand("start").setExecutor(start);
-        this.getCommand("start").setTabCompleter(start);
-        this.getCommand("stopgm").setExecutor(new Stop());
-        this.getCommand("commandevents").setExecutor(new Admin());
-        this.getCommand("revive").setExecutor(new Revive());
+//        annotationParser.parse(new Start());
+        annotationParser.parse(new Stop());
+        annotationParser.parse(new Admin());
+        annotationParser.parse(new Revive());
 
         final Reflections events = new Reflections("me.commandrod.events.events");
         for (Class<? extends Event> event : events.getSubTypesOf(Event.class)){
@@ -49,8 +53,10 @@ public final class Main extends JavaPlugin {
             EventManager.getEvents().put((EventType) event.getMethod("getType").invoke(instance), instance);
         }
 
+        this.getCommand("start").setExecutor(new Start());
         // Custom Listeners
         Bukkit.getPluginManager().registerEvents(new SpleefListener(), this);
+        Bukkit.getPluginManager().registerEvents(new SnowDodgeListener(), this);
 
         for (World world : Bukkit.getServer().getWorlds()){
             world.setGameRule(GameRule.DO_IMMEDIATE_RESPAWN, true);
