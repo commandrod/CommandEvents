@@ -1,6 +1,5 @@
 package me.commandrod.events.listeners;
 
-import me.commandrod.commandapi.utils.Utils;
 import me.commandrod.events.Main;
 import me.commandrod.events.api.event.Event;
 import me.commandrod.events.api.event.EventManager;
@@ -23,6 +22,16 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.*;
 
 public class EventListener implements Listener {
+
+    @EventHandler
+    public void onInteract(PlayerInteractEvent e) {
+        if (!EventManager.isEventRunning()) return;
+        Player p = e.getPlayer();
+        Event event = Main.getEvent();
+        if (event.isDead(p))
+            return;
+        e.setCancelled(event.onInteract(p, e));
+    }
 
     @EventHandler
     public void onClick(InventoryClickEvent e){

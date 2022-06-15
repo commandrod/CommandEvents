@@ -8,5 +8,6 @@ public enum EventType {
     WATERDROP,
     PARKOURTAG,
     SIMON,
-    SNOWDODGE
+    SNOWDODGE,
+    GOLDENTAIL
 }

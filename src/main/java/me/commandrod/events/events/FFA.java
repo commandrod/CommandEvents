@@ -15,10 +15,12 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 public class FFA extends Event {
 
@@ -30,11 +32,13 @@ public class FFA extends Event {
         this.killsCounter = new Counter("Kills");
     }
 
-    private ItemStack goldenHead(Player owner){
-        ItemStack itemStack = ItemUtils.giveItem(owner, CommandItem.getCommandItem("GOLDEN_HEAD"), "KILL", 1, false);
+    private Optional<ItemStack> goldenHead(Player owner){
+        Optional<CommandItem> opItem = CommandItem.from("GOLDEN_HEAD");
+        if (opItem.isEmpty()) return Optional.empty();
+        ItemStack itemStack = ItemUtils.giveItem(owner, opItem.get(), "KILL", 1, false);
         ItemUtils.storeStringInItem(itemStack, "player", owner.getUniqueId().toString());
         ItemUtils.updateLore(itemStack);
-        return itemStack;
+        return Optional.of(itemStack);
     }
 
     public void preEventStart() {
@@ -59,8 +63,11 @@ public class FFA extends Event {
     public void onDeath(Player player) {
         Player killer = player.getKiller();
         if (killer == null) return;
-        killer.getInventory().addItem(goldenHead(player));
-        this.getKillsCounter().add(killer);
+        Optional<ItemStack> opHead = goldenHead(player);
+        opHead.ifPresent(head -> {
+            killer.getInventory().addItem(head);
+            this.getKillsCounter().add(killer);
+        });
     }
 
     public List<String> getLines(Player player) {
@@ -77,4 +84,5 @@ public class FFA extends Event {
     public boolean onDamageByPlayer(Player attacker, Player damaged) { return !this.getEventState().equals(EventState.PLAYING); }
     public boolean onDamage(Player player, EntityDamageEvent event) { return event.getCause().equals(EntityDamageEvent.DamageCause.FALL); }
     public boolean onInventoryClick(Player clicker, InventoryClickEvent event) { return false; }
+    public boolean onInteract(Player player, PlayerInteractEvent event) { return false; }
 }

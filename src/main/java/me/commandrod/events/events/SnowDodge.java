@@ -11,10 +11,13 @@ import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -92,13 +95,33 @@ public class SnowDodge extends Event {
         return false;
     }
 
-    public void onClick(Player clicker, Block barrel) {
-        clicker.getInventory().addItem(ItemUtils.quickItem(Material.SNOWBALL, "כדור שלג&d", null, false));
+    private boolean hasPowerup(Player player) {
+        return false;
+    }
+
+    public void onClick(Player clicker, Block block) {
+        ItemStack snowball = ItemUtils.quickItem(Material.SNOWBALL, "כדור שלג&d", null, false);
+        if (hasPowerup(clicker)) {
+            snowball.setAmount(3);
+        }
+        clicker.getInventory().addItem(snowball);
         SoundUtils.playSound(clicker, Sound.ENTITY_ITEM_PICKUP);
     }
 
     public boolean onDamage(Player attacker, EntityDamageEvent event) {
         return !event.getCause().equals(EntityDamageEvent.DamageCause.CUSTOM);
+    }
+
+    public boolean onInteract(Player player, PlayerInteractEvent event) {
+        if (!event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) return false;
+        Block clickedBlock = event.getClickedBlock();
+        if (clickedBlock == null) return false;
+        if (!clickedBlock.getType().equals(BLOCKTYPE)) return false;
+        Player p = event.getPlayer();
+        boolean cooldown = this.cooldown(p, clickedBlock);
+        if (cooldown) return true;
+        this.onClick(p, clickedBlock);
+        return true;
     }
 
     public void preEventStart() { }

@@ -20,6 +20,5 @@ public class ActiveEffectListener implements Runnable {
     public void run() {
         if (!EventManager.isEventRunning()) return;
         event.activeEffect();
-        Bukkit.getOnlinePlayers().forEach(event::sendScoreboard);
     }
 }

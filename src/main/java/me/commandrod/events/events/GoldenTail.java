@@ -2,7 +2,6 @@ package me.commandrod.events.events;
 
 import me.commandrod.commandapi.cooldown.CommandCooldown;
 import me.commandrod.commandapi.items.ItemUtils;
-import me.commandrod.commandapi.utils.Utils;
 import me.commandrod.events.Main;
 import me.commandrod.events.api.event.Event;
 import me.commandrod.events.api.event.EventState;
@@ -21,30 +20,37 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
-public class TntTag extends Event {
+public class GoldenTail extends Event {
 
     private final List<Player> taggers;
     private final CommandCooldown cooldownManager;
     private int time;
+    private int round;
 
     private final int defaultTime = 45;
 
-    private ItemStack tnt(){ return ItemUtils.quickItem(Material.TNT, "&cאתה התופס!", null, false); }
+    private ItemStack helmet() {
+        return ItemUtils.quickItem(Material.GOLDEN_HELMET, "&6אתה הבורח!",
+            Collections.singletonList("נסה להשאר כמה שיותר עם הקסדה!&6"), false);
+    }
 
-    public TntTag() {
-        super(EventType.TNTTAG, "התופס המתפוצץ");
+    public GoldenTail() {
+        super(EventType.GOLDENTAIL, "זנב הזהב");
         this.taggers = new ArrayList<>();
         this.cooldownManager = new CommandCooldown(.3f, false);
         this.time = defaultTime;
+        this.round = 0;
     }
 
     public List<String> getLines(Player player) {
         return Arrays.asList(
-                "&7זמן לפיצוץ: &b" + this.time,
+                "&7סיבוב מספר: &b" + this.round,
+                "&7זמן לסיבוב: &b" + this.time,
                 "&7מספר התופסים: &b" + this.taggers.size()
         );
     }
@@ -53,7 +59,11 @@ public class TntTag extends Event {
     public void activeEffect() {
         if (this.time > 0) this.time--;
         if (this.time != 0) return;
-        for (Player player : this.getPlayers().stream().filter(this.taggers::contains).collect(Collectors.toList()))
+        List<Player> filteredPlayers = this.getPlayers()
+                .stream()
+                .filter(p -> !this.taggers.contains(p))
+                .collect(Collectors.toList());
+        for (Player player : filteredPlayers)
             this.eliminate(player);
         this.randomTag();
     }
@@ -65,11 +75,11 @@ public class TntTag extends Event {
     public void onEventEnd(Player winner) { this.taggers.clear(); }
 
     public boolean onDamageByPlayer(Player attacker, Player damaged) {
-        if (!this.taggers.contains(attacker)) return true;
-        if (this.taggers.contains(damaged)) return true;
-        if (!this.cooldownManager.call(attacker) || !this.cooldownManager.call(damaged)) return true;
-        this.tag(damaged, attacker);
-        this.untag(attacker);
+        if (!this.taggers.contains(damaged)) return true;
+        if (this.taggers.contains(attacker)) return true;
+        if (!this.cooldownManager.call(damaged) || !this.cooldownManager.call(attacker)) return true;
+        this.tag(attacker);
+        this.untag(damaged);
         return true;
     }
 
@@ -79,38 +89,33 @@ public class TntTag extends Event {
         player.getLocation().createExplosion(4f, false, false);
     }
 
-    private void randomTag(){
+    private void randomTag() {
         if (!this.getEventState().equals(EventState.PLAYING)) return;
         this.time = this.defaultTime;
+        this.round++;
         int amount = Math.floorDiv(this.getPlayers().size(), 3);
         int finalAmount = Math.max(amount, 1);
         Bukkit.getScheduler().runTaskLater(Main.getPlugin(), () -> {
             for (int i = 0; i < finalAmount; i++){
-            List<Player> filtered = this.getPlayers().stream()
-                    .filter(p -> !this.taggers.contains(p))
-                    .collect(Collectors.toList());
-            Player player = filtered.get(ThreadLocalRandom.current().nextInt(this.getPlayers().size() - 1));
-            this.tag(player, null);
-        }}, 50);
+                List<Player> filtered = this.getPlayers().stream()
+                        .filter(p -> !this.taggers.contains(p))
+                        .collect(Collectors.toList());
+                Player player = filtered.get(ThreadLocalRandom.current().nextInt(this.getPlayers().size() - 1));
+                this.tag(player);
+            }}, 50);
     }
 
-    private void untag(Player player){
+    private void untag(Player player) {
         this.taggers.remove(player);
-        player.getInventory().clear();
+        player.getInventory().setHelmet(null);
+        player.setGlowing(false);
     }
 
-    private void tag(Player player, Player attacker){
+    private void tag(Player player) {
         if (this.taggers.contains(player)) return;
         this.taggers.add(player);
-        for (int i = 0; i < 9; i++){
-            player.getInventory().setItem(i, tnt());
-        }
-        player.getInventory().setHelmet(tnt());
-        if (attacker == null){
-            Bukkit.broadcast(Utils.color("&7" + player.getName() + " has been tagged!"));
-            return;
-        }
-        Bukkit.broadcast(Utils.color("&7" + player.getName() + " has been tagged by " + attacker.getName() + "!"));
+        player.getInventory().setHelmet(helmet());
+        player.setGlowing(true);
     }
 
     public void onRespawn(Player player) { }

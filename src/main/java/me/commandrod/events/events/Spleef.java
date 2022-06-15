@@ -17,6 +17,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -93,4 +94,5 @@ public class Spleef extends Event {
     public boolean onDamageByPlayer(Player attacker, Player damaged) { return true; }
     public boolean onDamage(Player player, EntityDamageEvent event) { return event.getCause().equals(EntityDamageEvent.DamageCause.FALL); }
     public boolean onInventoryClick(Player clicker, InventoryClickEvent event) { return false; }
+    public boolean onInteract(Player player, PlayerInteractEvent event) { return false; }
 }

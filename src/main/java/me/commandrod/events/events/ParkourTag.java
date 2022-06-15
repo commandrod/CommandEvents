@@ -11,6 +11,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -81,14 +82,6 @@ public class ParkourTag extends Event {
         for (Player player : this.getPlayers())
             this.sendRole(player);
     }
-    public void onEventEnd(Player winner) { }
-    public void onDeath(Player player) { }
-    public void onRespawn(Player player) { }
-    public boolean onBreakBlock(BlockBreakEvent event, Player breaker, Block block) { return true; }
-    public boolean onPlaceBlock(BlockPlaceEvent event, Player placer, Block block, Block replacedBlock) { return true; }
-    public boolean onDamageByPlayer(Player attacker, Player damaged) { return true; }
-    public boolean onDamage(Player player, EntityDamageEvent event) { return true; }
-    public boolean onInventoryClick(Player clicker, InventoryClickEvent event) { return false; }
 
     private void initPlayers() {
         int taggersAmount = Math.max(Math.floorDiv(this.getPlayers().size(), 4), 1);
@@ -126,4 +119,14 @@ public class ParkourTag extends Event {
     private String roleFilter(Player player) {
         return taggers.contains(player) ? "&cתופס!" : "&bרץ!";
     }
+
+    public void onEventEnd(Player winner) { }
+    public void onDeath(Player player) { }
+    public void onRespawn(Player player) { }
+    public boolean onBreakBlock(BlockBreakEvent event, Player breaker, Block block) { return true; }
+    public boolean onPlaceBlock(BlockPlaceEvent event, Player placer, Block block, Block replacedBlock) { return true; }
+    public boolean onDamageByPlayer(Player attacker, Player damaged) { return true; }
+    public boolean onDamage(Player player, EntityDamageEvent event) { return true; }
+    public boolean onInventoryClick(Player clicker, InventoryClickEvent event) { return false; }
+    public boolean onInteract(Player player, PlayerInteractEvent event) { return false; }
 }

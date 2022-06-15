@@ -23,6 +23,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
@@ -105,6 +106,8 @@ public abstract class Event {
                     event.onEventStart();
                     ActiveEffectListener listener = new ActiveEffectListener(event);
                     Bukkit.getScheduler().scheduleSyncRepeatingTask(Main.getPlugin(), listener, 0, listener.getTime());
+                    Bukkit.getScheduler().scheduleSyncRepeatingTask(Main.getPlugin(),
+                            () -> Bukkit.getOnlinePlayers().forEach(event::sendScoreboard), 0, 20);
                     this.cancel();
                 }
                 countdown.getAndDecrement();
@@ -227,4 +230,5 @@ public abstract class Event {
     public abstract boolean onDamageByPlayer(Player attacker, Player damaged);
     public abstract boolean onDamage(Player player, EntityDamageEvent event);
     public abstract boolean onInventoryClick(Player clicker, InventoryClickEvent event);
+    public abstract boolean onInteract(Player player, PlayerInteractEvent event);
 }

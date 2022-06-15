@@ -12,6 +12,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 
 import java.util.Collections;
 import java.util.List;
@@ -70,4 +71,5 @@ public class Simon extends Event {
     public void onEventEnd(Player winner) { }
     public void onRespawn(Player player) { }
     public boolean onInventoryClick(Player clicker, InventoryClickEvent event) { return false; }
+    public boolean onInteract(Player player, PlayerInteractEvent event) { return false; }
 }
