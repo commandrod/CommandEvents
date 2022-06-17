@@ -4,15 +4,8 @@ import lombok.Getter;
 import me.commandrod.commandapi.utils.Utils;
 import me.commandrod.events.api.event.Event;
 import me.commandrod.events.api.event.EventType;
-import me.commandrod.events.api.event.Handle;
 import org.bukkit.Bukkit;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,28 +15,6 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 public class ParkourTag extends Event {
-
-    private record Game(@Getter Player tagger, @Getter List<Player> runners) {
-
-        private static final HashMap<Player, Game> games = new HashMap<>();
-        @Getter
-        private static final List<Player> allPlayers = new ArrayList<>();
-
-        public void addRunner(Player player) {
-            allPlayers.add(player);
-            this.runners.add(player);
-        }
-
-        public static Game from(Player tagger) {
-            if (!games.containsKey(tagger)) {
-                allPlayers.add(tagger);
-                Game game = new Game(tagger, new ArrayList<>());
-                games.put(tagger, game);
-                return game;
-            }
-            return games.get(tagger);
-        }
-    }
 
     private final List<Player> taggers;
     private int time;
@@ -75,14 +46,12 @@ public class ParkourTag extends Event {
         }
     }
 
-    public void onEventStart() {
-        this.initPlayers();
-    }
-
     public void preEventStart() {
         for (Player player : this.getPlayers())
             this.sendRole(player);
     }
+
+    public void onEventStart() { this.initPlayers(); }
 
     private void initPlayers() {
         int taggersAmount = Math.max(Math.floorDiv(this.getPlayers().size(), 4), 1);
@@ -121,13 +90,25 @@ public class ParkourTag extends Event {
         return taggers.contains(player) ? "&cתופס!" : "&bרץ!";
     }
 
-    public void onEventEnd(Player winner) { }
-    public void onDeath(Player player) { }
-    public void onRespawn(Player player) { }
-    public boolean onBreakBlock(BlockBreakEvent event, Player breaker, Block block) { return true; }
-    public boolean onPlaceBlock(BlockPlaceEvent event, Player placer, Block block, Block replacedBlock) { return true; }
-    public boolean onDamageByPlayer(Player attacker, Player damaged) { return true; }
-    public boolean onDamage(Player player, EntityDamageEvent event) { return true; }
-    public Handle onInventoryClick(Player clicker, InventoryClickEvent event) { return Handle.NONE; }
-    public boolean onInteract(Player player, PlayerInteractEvent event) { return false; }
+    private record Game(@Getter Player tagger, @Getter List<Player> runners) {
+
+        private static final HashMap<Player, Game> games = new HashMap<>();
+        @Getter
+        private static final List<Player> allPlayers = new ArrayList<>();
+
+        public void addRunner(Player player) {
+            allPlayers.add(player);
+            this.runners.add(player);
+        }
+
+        public static Game from(Player tagger) {
+            if (!games.containsKey(tagger)) {
+                allPlayers.add(tagger);
+                Game game = new Game(tagger, new ArrayList<>());
+                games.put(tagger, game);
+                return game;
+            }
+            return games.get(tagger);
+        }
+    }
 }

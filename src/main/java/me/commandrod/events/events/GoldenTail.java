@@ -9,15 +9,9 @@ import me.commandrod.events.api.event.EventState;
 import me.commandrod.events.api.event.EventType;
 import me.commandrod.events.api.event.Handle;
 import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
@@ -36,11 +30,6 @@ public class GoldenTail extends Event {
     private int round;
 
     private final int defaultTime = 45;
-
-    private ItemStack helmet() {
-        return ItemUtils.quickItem(Material.GOLDEN_LEGGINGS, "&6אתה הבורח!",
-            Collections.singletonList("נסה להשאר כמה שיותר עם המכנסיים!&6"), false);
-    }
 
     public GoldenTail() {
         super(EventType.GOLDENTAIL, "מכנסי הזהב");
@@ -76,12 +65,6 @@ public class GoldenTail extends Event {
         this.randomTag();
     }
 
-    public void preEventStart() { for (Player player : this.getPlayers()) player.setGameMode(GameMode.ADVENTURE); }
-
-    public void onEventStart() { this.randomTag(); }
-
-    public void onEventEnd(Player winner) { this.taggers.clear(); }
-
     public boolean onDamageByPlayer(Player attacker, Player damaged) {
         if (!this.taggers.contains(damaged)) return true;
         if (this.taggers.contains(attacker)) return true;
@@ -96,6 +79,10 @@ public class GoldenTail extends Event {
         this.untag(player);
         player.getLocation().createExplosion(4f, false, false);
     }
+
+    public void onEventStart() { this.randomTag(); }
+    public void onEventEnd(Player winner) { this.taggers.clear(); }
+    public Handle onInventoryClick(Player clicker, InventoryClickEvent event) { return Handle.TRUE; }
 
     private void randomTag() {
         if (!this.getEventState().equals(EventState.PLAYING)) return;
@@ -126,10 +113,8 @@ public class GoldenTail extends Event {
         player.setGlowing(true);
     }
 
-    public void onRespawn(Player player) { }
-    public boolean onBreakBlock(BlockBreakEvent event, Player breaker, Block block) { return true; }
-    public boolean onPlaceBlock(BlockPlaceEvent event, Player placer, Block block, Block replacedBlock) { return true; }
-    public boolean onDamage(Player attacker, EntityDamageEvent event) { return true; }
-    public Handle onInventoryClick(Player clicker, InventoryClickEvent event) { return Handle.TRUE; }
-    public boolean onInteract(Player player, PlayerInteractEvent event) { return false; }
+    private ItemStack helmet() {
+        return ItemUtils.quickItem(Material.GOLDEN_LEGGINGS, "&6אתה הבורח!",
+                Collections.singletonList("נסה להשאר כמה שיותר עם המכנסיים!&6"), false);
+    }
 }

@@ -7,17 +7,10 @@ import me.commandrod.events.Main;
 import me.commandrod.events.api.event.Event;
 import me.commandrod.events.api.event.EventState;
 import me.commandrod.events.api.event.EventType;
-import me.commandrod.events.api.event.Handle;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
@@ -113,11 +106,4 @@ public class TntTag extends Event {
         }
         Bukkit.broadcast(Utils.color("&7" + player.getName() + " has been tagged by " + attacker.getName() + "!"));
     }
-
-    public void onRespawn(Player player) { }
-    public boolean onBreakBlock(BlockBreakEvent event, Player breaker, Block block) { return true; }
-    public boolean onPlaceBlock(BlockPlaceEvent event, Player placer, Block block, Block replacedBlock) { return true; }
-    public boolean onDamage(Player attacker, EntityDamageEvent event) { return true; }
-    public Handle onInventoryClick(Player clicker, InventoryClickEvent event) { return Handle.TRUE; }
-    public boolean onInteract(Player player, PlayerInteractEvent event) { return false; }
 }

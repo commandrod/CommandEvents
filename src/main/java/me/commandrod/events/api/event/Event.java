@@ -33,16 +33,17 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Getter @Setter
-public abstract class Event {
+public abstract class Event implements AbstractEvent {
 
-    private EventType type;
-    private List<Player> players;
+    private final EventType type;
+    private final List<Player> players;
+    private final String subtitle;
+    private final String friendlyName;
+    private final int activeEffectTime;
+    private final Event instance;
+
     private Location spawnLocation;
     private EventState eventState;
-    private String subtitle;
-    private String friendlyName;
-    private int activeEffectTime;
-    private Event instance;
 
     public Event(EventType type, String friendlyName, int activeEffectTime){
         this.type = type;
@@ -107,7 +108,10 @@ public abstract class Event {
                     event.setEventState(EventState.PLAYING);
                     event.onEventStart();
                     ActiveEffectListener listener = new ActiveEffectListener(event);
-                    Bukkit.getScheduler().scheduleSyncRepeatingTask(Main.getPlugin(), listener, 0, listener.getTime());
+                    int time = listener.getTime();
+                    if (time > 0) {
+                        Bukkit.getScheduler().scheduleSyncRepeatingTask(Main.getPlugin(), listener, 0, time);
+                    }
                     Bukkit.getScheduler().scheduleSyncRepeatingTask(Main.getPlugin(),
                             () -> Bukkit.getOnlinePlayers().forEach(event::sendScoreboard), 0, 20);
                     this.cancel();
@@ -199,10 +203,6 @@ public abstract class Event {
         }, 20*3);
     }
 
-    public boolean isDead(Player player) {
-        return !this.players.contains(player);
-    }
-
     public void sendScoreboard(Player player) {
         Scoreboard scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
         Objective obj = scoreboard.registerNewObjective("gamesb", "dummy", Utils.color("&b&lActive Events"));
@@ -221,17 +221,21 @@ public abstract class Event {
         player.setScoreboard(scoreboard);
     }
 
-    public abstract List<String> getLines(Player player);
-    public abstract void activeEffect();
-    public abstract void preEventStart();
-    public abstract void onEventStart();
-    public abstract void onEventEnd(Player winner);
-    public abstract void onDeath(Player player);
-    public abstract void onRespawn(Player player);
-    public abstract boolean onBreakBlock(BlockBreakEvent event, Player breaker, Block block);
-    public abstract boolean onPlaceBlock(BlockPlaceEvent event, Player placer, Block block, Block replacedBlock);
-    public abstract boolean onDamageByPlayer(Player attacker, Player damaged);
-    public abstract boolean onDamage(Player player, EntityDamageEvent event);
-    public abstract Handle onInventoryClick(Player clicker, InventoryClickEvent event);
-    public abstract boolean onInteract(Player player, PlayerInteractEvent event);
+    public boolean isDead(Player player) {
+        return !this.players.contains(player);
+    }
+
+    public List<String> getLines(Player player) { return null; }
+    public void activeEffect() {}
+    public void preEventStart() { }
+    public void onEventStart() {}
+    public void onEventEnd(Player winner) {}
+    public void onDeath(Player player) {}
+    public void onRespawn(Player player) {}
+    public boolean onBreakBlock(BlockBreakEvent event, Player breaker, Block block) { return true; }
+    public boolean onPlaceBlock(BlockPlaceEvent event, Player placer, Block block, Block replacedBlock) { return true; }
+    public boolean onDamageByPlayer(Player attacker, Player damaged) { return true; }
+    public boolean onDamage(Player player, EntityDamageEvent event) { return true; }
+    public Handle onInventoryClick(Player clicker, InventoryClickEvent event) { return Handle.NONE; }
+    public Handle onInteract(Player player, PlayerInteractEvent event) { return Handle.NONE; }
 }

@@ -3,7 +3,10 @@ package me.commandrod.events.events;
 import lombok.Getter;
 import me.commandrod.commandapi.items.ItemUtils;
 import me.commandrod.events.api.Counter;
-import me.commandrod.events.api.event.*;
+import me.commandrod.events.api.event.Event;
+import me.commandrod.events.api.event.EventManager;
+import me.commandrod.events.api.event.EventState;
+import me.commandrod.events.api.event.EventType;
 import me.commandrod.events.utils.EventUtils;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -11,10 +14,7 @@ import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -85,11 +85,5 @@ public class Spleef extends Event {
         this.getDestroyedBlocks().forEach(block -> block.setType(Material.SNOW_BLOCK));
     }
 
-    public void onDeath(Player player) { }
-    public void onRespawn(Player player) { }
-    public boolean onPlaceBlock(BlockPlaceEvent event, Player placer, Block block, Block replacedBlock) { return true; }
-    public boolean onDamageByPlayer(Player attacker, Player damaged) { return true; }
     public boolean onDamage(Player player, EntityDamageEvent event) { return event.getCause().equals(EntityDamageEvent.DamageCause.FALL); }
-    public Handle onInventoryClick(Player clicker, InventoryClickEvent event) { return Handle.NONE; }
-    public boolean onInteract(Player player, PlayerInteractEvent event) { return false; }
 }

@@ -7,17 +7,12 @@ import me.commandrod.events.api.Counter;
 import me.commandrod.events.api.event.Event;
 import me.commandrod.events.api.event.EventState;
 import me.commandrod.events.api.event.EventType;
-import me.commandrod.events.api.event.Handle;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -25,14 +20,14 @@ import java.util.*;
 
 public class Waterdrop extends Event {
 
-    private final int DEFAULT_TIME = 15;
     private final List<Player> passedPlayers;
     private final Counter furthestRoundCounter;
-
     private int round;
     private int time;
     private List<Block> blocks;
     private boolean roundRunning;
+
+    private final int DEFAULT_TIME = 15;
 
     public Waterdrop() {
         super(EventType.WATERDROP, "קפיצה למים");
@@ -67,7 +62,7 @@ public class Waterdrop extends Event {
         if (this.time > 0) this.time--;
         if (this.time == 0 || (this.passedPlayers.size() == this.getPlayers().size())){
             this.getPlayers().stream().filter(player -> player != null && !this.passedPlayers.contains(player)).forEach(this::eliminate);
-            newRound();
+            this.newRound();
         }
     }
 
@@ -76,7 +71,7 @@ public class Waterdrop extends Event {
             player.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 20*10000, 0, false, false));
             player.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 20*10000, 0, false, false));
         }
-        newRound();
+        this.newRound();
     }
 
     public void onEventEnd(Player winner) {
@@ -93,6 +88,8 @@ public class Waterdrop extends Event {
         this.eliminate(player);
         return true;
     }
+
+    public void onDeath(Player player) { this.furthestRoundCounter.set(player, this.round); }
 
     private void newRound() {
         Random rand = new Random();
@@ -119,13 +116,4 @@ public class Waterdrop extends Event {
         this.spawn();
         this.roundRunning = false;
     }
-
-    public void preEventStart() { }
-    public void onDeath(Player player) { this.furthestRoundCounter.set(player, this.round); }
-    public void onRespawn(Player player) { }
-    public boolean onBreakBlock(BlockBreakEvent event, Player breaker, Block block) { return true; }
-    public boolean onPlaceBlock(BlockPlaceEvent event, Player placer, Block block, Block replacedBlock) { return true; }
-    public boolean onDamageByPlayer(Player attacker, Player damaged) { return true; }
-    public Handle onInventoryClick(Player clicker, InventoryClickEvent event) { return Handle.NONE; }
-    public boolean onInteract(Player player, PlayerInteractEvent event) { return false; }
 }

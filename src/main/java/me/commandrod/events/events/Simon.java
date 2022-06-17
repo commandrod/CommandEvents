@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.Setter;
 import me.commandrod.events.api.event.Event;
 import me.commandrod.events.api.event.EventType;
-import me.commandrod.events.api.event.Handle;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.block.Block;
@@ -12,8 +11,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
 
 import java.util.Collections;
 import java.util.List;
@@ -37,6 +34,11 @@ public class Simon extends Event {
         return Collections.singletonList("&7המלך: &b" + kingName);
     }
 
+    public void preEventStart() {
+        this.king = getKing();
+        this.sendScoreboard(this.getKing());
+    }
+
     public boolean onDamageByPlayer(Player attacker, Player damaged) {
         if (attacker.getUniqueId().equals(this.king.getUniqueId())){
             this.eliminate(damaged);
@@ -46,15 +48,8 @@ public class Simon extends Event {
     }
 
     public boolean onDamage(Player player, EntityDamageEvent event) { return !this.isPvP; }
-    public void onDeath(Player player) { for (Player players : this.getPlayers()) this.sendScoreboard(players); }
-
     public boolean onBreakBlock(BlockBreakEvent event, Player breaker, Block block) { return canBuild(breaker); }
     public boolean onPlaceBlock(BlockPlaceEvent event, Player placer, Block block, Block replacedBlock) { return canBuild(placer); }
-
-    public void preEventStart() {
-        this.king = getKing();
-        this.sendScoreboard(this.getKing());
-    }
 
     private Player getKing() {
         List<Player> managers = Bukkit.getOnlinePlayers().stream()
@@ -66,11 +61,4 @@ public class Simon extends Event {
     private boolean canBuild(Player player) {
         return !(this.king.equals(player) || player.getGameMode().equals(GameMode.CREATIVE));
     }
-
-    public void activeEffect() { }
-    public void onEventStart() { }
-    public void onEventEnd(Player winner) { }
-    public void onRespawn(Player player) { }
-    public Handle onInventoryClick(Player clicker, InventoryClickEvent event) { return Handle.NONE; }
-    public boolean onInteract(Player player, PlayerInteractEvent event) { return false; }
 }
