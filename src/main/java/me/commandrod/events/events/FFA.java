@@ -3,13 +3,12 @@ package me.commandrod.events.events;
 import lombok.Getter;
 import me.commandrod.commandapi.items.CommandItem;
 import me.commandrod.commandapi.items.ItemUtils;
-import me.commandrod.commandapi.utils.Utils;
 import me.commandrod.events.api.Counter;
 import me.commandrod.events.api.event.Event;
 import me.commandrod.events.api.event.EventState;
 import me.commandrod.events.api.event.EventType;
+import me.commandrod.events.api.event.Handle;
 import me.commandrod.events.utils.EventUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -83,6 +82,6 @@ public class FFA extends Event {
     public boolean onPlaceBlock(BlockPlaceEvent event, Player placer, Block block, Block replacedBlock) { return true; }
     public boolean onDamageByPlayer(Player attacker, Player damaged) { return !this.getEventState().equals(EventState.PLAYING); }
     public boolean onDamage(Player player, EntityDamageEvent event) { return event.getCause().equals(EntityDamageEvent.DamageCause.FALL); }
-    public boolean onInventoryClick(Player clicker, InventoryClickEvent event) { return false; }
+    public Handle onInventoryClick(Player clicker, InventoryClickEvent event) { return Handle.NONE; }
     public boolean onInteract(Player player, PlayerInteractEvent event) { return false; }
 }

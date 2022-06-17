@@ -2,7 +2,6 @@ package me.commandrod.events.api.event;
 
 import lombok.Getter;
 import lombok.Setter;
-import me.commandrod.commandapi.CommandAPI;
 import me.commandrod.commandapi.utils.ConfigUtils;
 import me.commandrod.commandapi.utils.MessageUtils;
 import me.commandrod.commandapi.utils.SoundUtils;
@@ -19,7 +18,6 @@ import org.bukkit.block.Block;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -234,6 +232,6 @@ public abstract class Event {
     public abstract boolean onPlaceBlock(BlockPlaceEvent event, Player placer, Block block, Block replacedBlock);
     public abstract boolean onDamageByPlayer(Player attacker, Player damaged);
     public abstract boolean onDamage(Player player, EntityDamageEvent event);
-    public abstract boolean onInventoryClick(Player clicker, InventoryClickEvent event);
+    public abstract Handle onInventoryClick(Player clicker, InventoryClickEvent event);
     public abstract boolean onInteract(Player player, PlayerInteractEvent event);
 }

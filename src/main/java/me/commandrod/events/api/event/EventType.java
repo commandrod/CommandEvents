@@ -9,5 +9,6 @@ public enum EventType {
     PARKOURTAG,
     SIMON,
     SNOWDODGE,
-    GOLDENTAIL
+    GOLDENTAIL,
+    FALLGUYS
 }

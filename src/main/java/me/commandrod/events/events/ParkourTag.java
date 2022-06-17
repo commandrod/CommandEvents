@@ -4,6 +4,7 @@ import lombok.Getter;
 import me.commandrod.commandapi.utils.Utils;
 import me.commandrod.events.api.event.Event;
 import me.commandrod.events.api.event.EventType;
+import me.commandrod.events.api.event.Handle;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -127,6 +128,6 @@ public class ParkourTag extends Event {
     public boolean onPlaceBlock(BlockPlaceEvent event, Player placer, Block block, Block replacedBlock) { return true; }
     public boolean onDamageByPlayer(Player attacker, Player damaged) { return true; }
     public boolean onDamage(Player player, EntityDamageEvent event) { return true; }
-    public boolean onInventoryClick(Player clicker, InventoryClickEvent event) { return false; }
+    public Handle onInventoryClick(Player clicker, InventoryClickEvent event) { return Handle.NONE; }
     public boolean onInteract(Player player, PlayerInteractEvent event) { return false; }
 }

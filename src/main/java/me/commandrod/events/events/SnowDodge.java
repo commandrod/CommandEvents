@@ -6,6 +6,7 @@ import me.commandrod.commandapi.utils.SoundUtils;
 import me.commandrod.commandapi.utils.Utils;
 import me.commandrod.events.api.event.Event;
 import me.commandrod.events.api.event.EventType;
+import me.commandrod.events.api.event.Handle;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
@@ -132,5 +133,5 @@ public class SnowDodge extends Event {
     public boolean onBreakBlock(BlockBreakEvent event, Player breaker, Block block) { return true; }
     public boolean onPlaceBlock(BlockPlaceEvent event, Player placer, Block block, Block replacedBlock) { return true; }
     public boolean onDamageByPlayer(Player attacker, Player damaged) { return true; }
-    public boolean onInventoryClick(Player clicker, InventoryClickEvent event) { return true; }
+    public Handle onInventoryClick(Player clicker, InventoryClickEvent event) { return Handle.NONE; }
 }

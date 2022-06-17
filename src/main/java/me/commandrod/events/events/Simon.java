@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import me.commandrod.events.api.event.Event;
 import me.commandrod.events.api.event.EventType;
+import me.commandrod.events.api.event.Handle;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.block.Block;
@@ -70,6 +71,6 @@ public class Simon extends Event {
     public void onEventStart() { }
     public void onEventEnd(Player winner) { }
     public void onRespawn(Player player) { }
-    public boolean onInventoryClick(Player clicker, InventoryClickEvent event) { return false; }
+    public Handle onInventoryClick(Player clicker, InventoryClickEvent event) { return Handle.NONE; }
     public boolean onInteract(Player player, PlayerInteractEvent event) { return false; }
 }

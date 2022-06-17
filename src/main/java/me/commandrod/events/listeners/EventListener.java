@@ -4,11 +4,13 @@ import me.commandrod.events.Main;
 import me.commandrod.events.api.event.Event;
 import me.commandrod.events.api.event.EventManager;
 import me.commandrod.events.api.event.EventState;
+import me.commandrod.events.api.event.Handle;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Cancellable;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -22,6 +24,12 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.*;
 
 public class EventListener implements Listener {
+
+    private void manageHandle(Cancellable event, Handle handle) {
+        if (handle.equals(Handle.NONE)) return;
+        boolean cancel = handle.equals(Handle.TRUE);
+        event.setCancelled(cancel);
+    }
 
     @EventHandler
     public void onInteract(PlayerInteractEvent e) {
@@ -49,7 +57,8 @@ public class EventListener implements Listener {
             e.setCancelled(true);
             return;
         }
-        e.setCancelled(event.onInventoryClick(p, e));
+        Handle handle = event.onInventoryClick(p, e);
+        manageHandle(e, handle);
     }
 
     @EventHandler

@@ -7,6 +7,7 @@ import me.commandrod.events.Main;
 import me.commandrod.events.api.event.Event;
 import me.commandrod.events.api.event.EventState;
 import me.commandrod.events.api.event.EventType;
+import me.commandrod.events.api.event.Handle;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -117,6 +118,6 @@ public class TntTag extends Event {
     public boolean onBreakBlock(BlockBreakEvent event, Player breaker, Block block) { return true; }
     public boolean onPlaceBlock(BlockPlaceEvent event, Player placer, Block block, Block replacedBlock) { return true; }
     public boolean onDamage(Player attacker, EntityDamageEvent event) { return true; }
-    public boolean onInventoryClick(Player clicker, InventoryClickEvent event) { return true; }
+    public Handle onInventoryClick(Player clicker, InventoryClickEvent event) { return Handle.TRUE; }
     public boolean onInteract(Player player, PlayerInteractEvent event) { return false; }
 }
