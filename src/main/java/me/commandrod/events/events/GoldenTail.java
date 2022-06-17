@@ -3,6 +3,7 @@ package me.commandrod.events.events;
 import me.commandrod.commandapi.cooldown.CommandCooldown;
 import me.commandrod.commandapi.items.ItemUtils;
 import me.commandrod.events.Main;
+import me.commandrod.events.api.Counter;
 import me.commandrod.events.api.event.Event;
 import me.commandrod.events.api.event.EventState;
 import me.commandrod.events.api.event.EventType;
@@ -29,20 +30,22 @@ public class GoldenTail extends Event {
 
     private final List<Player> taggers;
     private final CommandCooldown cooldownManager;
+    private final Counter counter;
     private int time;
     private int round;
 
     private final int defaultTime = 45;
 
     private ItemStack helmet() {
-        return ItemUtils.quickItem(Material.GOLDEN_HELMET, "&6אתה הבורח!",
-            Collections.singletonList("נסה להשאר כמה שיותר עם הקסדה!&6"), false);
+        return ItemUtils.quickItem(Material.GOLDEN_LEGGINGS, "&6אתה הבורח!",
+            Collections.singletonList("נסה להשאר כמה שיותר עם המכנסיים!&6"), false);
     }
 
     public GoldenTail() {
-        super(EventType.GOLDENTAIL, "זנב הזהב");
+        super(EventType.GOLDENTAIL, "מכנסי הזהב");
         this.taggers = new ArrayList<>();
         this.cooldownManager = new CommandCooldown(.3f, false);
+        this.counter = new Counter("Points");
         this.time = defaultTime;
         this.round = 0;
     }
@@ -57,8 +60,12 @@ public class GoldenTail extends Event {
 
     // Time Manager
     public void activeEffect() {
-        if (this.time > 0) this.time--;
-        if (this.time != 0) return;
+        if (this.time > 0) {
+            for (Player player : this.taggers)
+                this.counter.add(player);
+            this.time--;
+            return;
+        }
         List<Player> filteredPlayers = this.getPlayers()
                 .stream()
                 .filter(p -> !this.taggers.contains(p))

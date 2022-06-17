@@ -3,11 +3,13 @@ package me.commandrod.events.events;
 import lombok.Getter;
 import me.commandrod.commandapi.items.CommandItem;
 import me.commandrod.commandapi.items.ItemUtils;
+import me.commandrod.commandapi.utils.Utils;
 import me.commandrod.events.api.Counter;
 import me.commandrod.events.api.event.Event;
 import me.commandrod.events.api.event.EventState;
 import me.commandrod.events.api.event.EventType;
 import me.commandrod.events.utils.EventUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -43,9 +45,9 @@ public class FFA extends Event {
 
     public void preEventStart() {
         this.getPlayers().forEach(player -> {
-            player.getInventory().setItemInMainHand(new ItemStack(Material.DIAMOND_AXE));
-            player.getInventory().setItemInOffHand(new ItemStack(Material.SHIELD));
+            player.getInventory().addItem(new ItemStack(Material.DIAMOND_AXE));
             player.getInventory().addItem(new ItemStack(Material.COOKED_BEEF, 4));
+            player.getInventory().setItemInOffHand(new ItemStack(Material.SHIELD));
             player.getInventory().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
             player.getInventory().setChestplate(new ItemStack(Material.DIAMOND_CHESTPLATE));
             player.getInventory().setLeggings(new ItemStack(Material.DIAMOND_LEGGINGS));
@@ -63,11 +65,9 @@ public class FFA extends Event {
     public void onDeath(Player player) {
         Player killer = player.getKiller();
         if (killer == null) return;
+        this.getKillsCounter().add(killer);
         Optional<ItemStack> opHead = goldenHead(player);
-        opHead.ifPresent(head -> {
-            killer.getInventory().addItem(head);
-            this.getKillsCounter().add(killer);
-        });
+        opHead.ifPresent(head -> killer.getInventory().addItem(head));
     }
 
     public List<String> getLines(Player player) {

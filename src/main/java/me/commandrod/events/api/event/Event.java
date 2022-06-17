@@ -19,6 +19,7 @@ import org.bukkit.block.Block;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -77,13 +78,16 @@ public abstract class Event {
             Bukkit.broadcast(Utils.color("&cAn error has occurred while trying to start this event!"), "commandevents.admin");
             return;
         }
+
         for (Player player : Bukkit.getOnlinePlayers()) {
             player.teleport(this.spawnLocation);
             if (player.getGameMode().equals(GameMode.CREATIVE) || player.getGameMode().equals(GameMode.SPECTATOR)) continue;
             this.players.add(player);
             this.sendScoreboard(player);
             player.setGameMode(GameMode.ADVENTURE);
+            player.playerListName(Utils.color("&a" + player.getName()));
         }
+
         this.preEventStart();
         AtomicInteger countdown = new AtomicInteger(seconds);
         this.eventState  = EventState.STARTING;
@@ -116,6 +120,7 @@ public abstract class Event {
     }
 
     public void eliminate(Player player){
+        player.playerListName(Utils.color("&c" + player.getName()));
         player.setGameMode(GameMode.SPECTATOR);
         if (this.isDead(player)) return;
         player.showTitle(Utils.toTitle("&cYou died!", "", 10, 60, 10));
