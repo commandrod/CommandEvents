@@ -2,12 +2,12 @@ package me.commandrod.events.api.event;
 
 import lombok.Getter;
 import lombok.Setter;
+import me.commandrod.commandapi.other.RepeatingTask;
 import me.commandrod.commandapi.utils.ConfigUtils;
 import me.commandrod.commandapi.utils.MessageUtils;
 import me.commandrod.commandapi.utils.SoundUtils;
 import me.commandrod.commandapi.utils.Utils;
 import me.commandrod.events.Main;
-import me.commandrod.events.api.RepeatingTask;
 import me.commandrod.events.listeners.ActiveEffectListener;
 import me.commandrod.events.utils.EventUtils;
 import org.bukkit.Bukkit;

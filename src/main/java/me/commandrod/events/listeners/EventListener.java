@@ -36,9 +36,8 @@ public class EventListener implements Listener {
         if (!EventManager.isEventRunning()) return;
         Player p = e.getPlayer();
         Event event = Main.getEvent();
-        if (event.isDead(p))
-            return;
-        e.setCancelled(event.onInteract(p, e));
+        if (event.isDead(p)) return;
+        manageHandle(e, event.onInteract(p, e));
     }
 
     @EventHandler
