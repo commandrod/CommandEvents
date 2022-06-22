@@ -14,10 +14,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
@@ -56,12 +53,14 @@ public class GoldenTail extends Event {
             this.time--;
             return;
         }
-        List<Player> filteredPlayers = this.getPlayers()
-                .stream()
-                .filter(p -> !this.taggers.contains(p))
-                .collect(Collectors.toList());
-        for (Player player : filteredPlayers)
-            this.eliminate(player);
+//        Set<Map.Entry<UUID, Integer>> playerCounterMap = this.sortByValue(this.counter.getMap()).entrySet();
+//        List<Player> filteredPlayers = new ArrayList<>();
+//        for (int i = 0; i < this.getAmount(); i++) {
+//            playerCounterMap
+//            filteredPlayers.add();
+//        }
+//        for (Player player : filteredPlayers)
+//            this.eliminate(player);
         this.randomTag();
     }
 
@@ -84,20 +83,32 @@ public class GoldenTail extends Event {
     public void onEventEnd(Player winner) { this.taggers.clear(); }
     public Handle onInventoryClick(Player clicker, InventoryClickEvent event) { return Handle.TRUE; }
 
+    private HashMap<UUID, Integer> sortByValue(HashMap<UUID, Integer> hm) {
+        List<Map.Entry<UUID, Integer> > list = new LinkedList<>(hm.entrySet());
+        list.sort(Map.Entry.comparingByValue());
+        HashMap<UUID, Integer> temp = new LinkedHashMap<>();
+        for (Map.Entry<UUID, Integer> aa : list)
+            temp.put(aa.getKey(), aa.getValue());
+        return temp;
+    }
+
     private void randomTag() {
         if (!this.getEventState().equals(EventState.PLAYING)) return;
         this.time = this.defaultTime;
         this.round++;
-        int amount = Math.floorDiv(this.getPlayers().size(), 3);
-        int finalAmount = Math.max(amount, 1);
+        int amount = this.getAmount();
         Bukkit.getScheduler().runTaskLater(Main.getPlugin(), () -> {
-            for (int i = 0; i < finalAmount; i++){
+            for (int i = 0; i < amount; i++){
                 List<Player> filtered = this.getPlayers().stream()
                         .filter(p -> !this.taggers.contains(p))
                         .collect(Collectors.toList());
                 Player player = filtered.get(ThreadLocalRandom.current().nextInt(this.getPlayers().size() - 1));
                 this.tag(player);
             }}, 50);
+    }
+
+    private int getAmount() {
+        return Math.max(Math.floorDiv(this.getPlayers().size(), 3), 1);
     }
 
     private void untag(Player player) {

@@ -31,23 +31,22 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class SnowDodge extends Event {
 
-    private final Counter snowballCounter;
-    private final Counter killCounter;
+    private final Counter snowballCounter, killCounter;
     private final AdvancedCooldown<SnowBarrel> commandCooldown = new AdvancedCooldown<>(5, true);
 
     public static final Material BLOCKTYPE = Material.BARREL;
 
     public SnowDodge() {
-        super(EventType.SNOWDODGE, "מחניים");
+        super(EventType.SNOWDODGE, "מלחמת השלג");
         this.killCounter = new Counter("Kills");
-        this.snowballCounter = new Counter("Snowballs Thrown");
+        this.snowballCounter = new Counter("Snowballs Picked Up");
     }
 
     public List<String> getLines(Player player) {
         return Arrays.asList(
                 "&7כדורי שלג שהרמת: &b" + this.snowballCounter.getValue(player),
                 "&7הריגות: &b" + this.killCounter.getValue(player),
-                "&7בורדר: &b" + EventUtils.border(this)
+                EventUtils.border(this)
         );
     }
 
@@ -93,7 +92,10 @@ public class SnowDodge extends Event {
         };
     }
 
-    public void onEventEnd(Player winner) { this.getSpawnLocation().getWorld().getWorldBorder().setSize(1000); }
+    public void onEventEnd(Player winner) {
+        this.killCounter.printResults();
+        this.snowballCounter.printResults();
+    }
 
     public void onDeath(Player player) {
         Player killer = player.getKiller();
@@ -101,7 +103,10 @@ public class SnowDodge extends Event {
         this.killCounter.add(killer);
     }
 
-    public boolean onDamageByPlayer(Player player, Player damager) { return false; }
+    public boolean onDamageByPlayer(Player player, Player damager) {
+        this.killCounter.add(damager);
+        return false;
+    }
 
     public Handle onInteract(Player player, PlayerInteractEvent event) {
         if (!event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) return Handle.NONE;
@@ -135,6 +140,7 @@ public class SnowDodge extends Event {
 
 
     public void onClick(Player clicker) {
+        this.snowballCounter.add(clicker);
         ItemStack snowball = ItemUtils.quickItem(Material.SNOWBALL, "כדור שלג&d", null, false);
         PowerUpManager powerups = PowerUpManager.from(clicker);
         float pitch = 1F;
@@ -153,6 +159,17 @@ public class SnowDodge extends Event {
     private record SnowBarrel(List<Block> blocks) {
 
         private static final HashMap<Block, SnowBarrel> barrelBlockMap = new HashMap<>();
+
+        private void addAllBlocks(Block block) {
+            this.blocks.add(block);
+            barrelBlockMap.put(block, this);
+        }
+
+        public void addBlock(Block block) {
+            this.addAllBlocks(block);
+            this.addAllBlocks(block.getRelative(BlockFace.DOWN));
+            this.addAllBlocks(block.getRelative(BlockFace.UP));
+        }
 
         public static SnowBarrel from(Block block) {
             final BlockFace[] directions = new BlockFace[] {
@@ -174,11 +191,7 @@ public class SnowDodge extends Event {
             SnowBarrel newBarrel = new SnowBarrel(new ArrayList<>());
             for (BlockFace direction : directions) {
                 Block newBlock = block.getRelative(direction);
-                if (!newBlock.getType().equals(BLOCKTYPE)) continue;
-                newBarrel.blocks.add(newBlock);
-                newBarrel.blocks.add(newBlock.getRelative(BlockFace.DOWN));
-                newBarrel.blocks.add(newBlock.getRelative(BlockFace.UP));
-                barrelBlockMap.put(newBlock, newBarrel);
+                newBarrel.addBlock(newBlock);
             }
             return newBarrel;
         }

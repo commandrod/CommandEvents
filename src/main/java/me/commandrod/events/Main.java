@@ -1,7 +1,6 @@
 package me.commandrod.events;
 
 import cloud.commandframework.annotations.AnnotationParser;
-import cloud.commandframework.annotations.CommandMethod;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
@@ -9,16 +8,17 @@ import me.commandrod.commandapi.CommandAPI;
 import me.commandrod.events.api.event.Event;
 import me.commandrod.events.api.event.EventManager;
 import me.commandrod.events.api.event.EventType;
-import me.commandrod.events.commands.*;
+import me.commandrod.events.commands.Admin;
+import me.commandrod.events.commands.Revive;
+import me.commandrod.events.commands.Start;
+import me.commandrod.events.commands.Stop;
 import me.commandrod.events.customlisteners.SnowDodgeListener;
 import me.commandrod.events.customlisteners.SpleefListener;
-import me.commandrod.events.events.SnowDodge;
 import me.commandrod.events.listeners.EventListener;
 import org.bukkit.Bukkit;
 import org.bukkit.GameRule;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.reflections.Reflections;
 

@@ -10,10 +10,7 @@ import me.commandrod.commandapi.utils.Utils;
 import me.commandrod.events.Main;
 import me.commandrod.events.listeners.ActiveEffectListener;
 import me.commandrod.events.utils.EventUtils;
-import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.EntityType;
@@ -37,8 +34,7 @@ public abstract class Event implements AbstractEvent {
 
     private final EventType type;
     private final List<Player> players;
-    private final String subtitle;
-    private final String friendlyName;
+    private final String subtitle, friendlyName, configName;
     private final int activeEffectTime;
     private final Event instance;
 
@@ -50,15 +46,15 @@ public abstract class Event implements AbstractEvent {
         this.players = new ArrayList<>();
         this.eventState = EventState.LOBBY;
         FileConfiguration config = Main.getPlugin().getConfig();
-        String eventConfigName = type.name().toLowerCase();
-        String subtitlePath = "subtitles." + eventConfigName;
+        this.configName = type.name().toLowerCase();
+        String subtitlePath = "subtitles." + this.configName;
         this.subtitle = config.isSet(subtitlePath) ? config.getString(subtitlePath) : "Good luck!";
         this.friendlyName = friendlyName;
         this.activeEffectTime = activeEffectTime;
         this.instance = this;
-        Optional<Location> opSpawn = ConfigUtils.getInstance().getLocation(eventConfigName + "-spawn-location");
+        Optional<Location> opSpawn = ConfigUtils.getInstance().getLocation(this.configName + "-spawn-location");
         if (opSpawn.isEmpty()) {
-            Main.getPlugin().getLogger().severe("Error getting spawn location for " + eventConfigName + "!");
+            Main.getPlugin().getLogger().severe("Error getting spawn location for " + this.configName + "!");
             return;
         }
         this.spawnLocation = opSpawn.get();
@@ -87,7 +83,10 @@ public abstract class Event implements AbstractEvent {
             player.playerListName(Utils.color("&a" + player.getName()));
         }
 
+        WorldBorder border = this.spawnLocation.getWorld().getWorldBorder();
+        border.setSize(5000);
         this.preEventStart();
+
         AtomicInteger countdown = new AtomicInteger(seconds);
         this.eventState  = EventState.STARTING;
         new RepeatingTask(20) {
@@ -235,7 +234,7 @@ public abstract class Event implements AbstractEvent {
     public boolean onBreakBlock(BlockBreakEvent event, Player breaker, Block block) { return true; }
     public boolean onPlaceBlock(BlockPlaceEvent event, Player placer, Block block, Block replacedBlock) { return true; }
     public boolean onDamageByPlayer(Player attacker, Player damaged) { return true; }
-    public boolean onDamage(Player player, EntityDamageEvent event) { return true; }
+    public boolean onDamage(Player player, EntityDamageEvent event) { return event.getCause().equals(EntityDamageEvent.DamageCause.FALL); }
     public Handle onInventoryClick(Player clicker, InventoryClickEvent event) { return Handle.NONE; }
     public Handle onInteract(Player player, PlayerInteractEvent event) { return Handle.NONE; }
 }

@@ -7,10 +7,12 @@ import me.commandrod.events.Main;
 import me.commandrod.events.api.event.Event;
 import me.commandrod.events.api.event.EventState;
 import me.commandrod.events.api.event.EventType;
+import me.commandrod.events.api.event.Handle;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
@@ -72,6 +74,8 @@ public class TntTag extends Event {
         this.untag(player);
         player.getLocation().createExplosion(4f, false, false);
     }
+
+    public Handle onInventoryClick(Player clicker, InventoryClickEvent event) { return Handle.TRUE; }
 
     private void randomTag(){
         if (!this.getEventState().equals(EventState.PLAYING)) return;

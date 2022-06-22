@@ -45,7 +45,7 @@ public class EventListener implements Listener {
         if (!EventManager.isEventRunning()) return;
         if (!(e.getWhoClicked() instanceof Player p)) return;
         if (e.getClickedInventory() == null) return;
-        if (e.getClickedInventory().equals(p.getInventory())) return;
+        if (!e.getClickedInventory().equals(p.getInventory())) return;
         if (e.getCurrentItem() == null) return;
         Event event = Main.getEvent();
         if (event.isDead(p)){

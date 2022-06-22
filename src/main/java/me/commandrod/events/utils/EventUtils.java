@@ -1,8 +1,12 @@
 package me.commandrod.events.utils;
 
+import me.commandrod.commandapi.utils.ConfigUtils;
 import me.commandrod.events.api.event.Event;
+import org.bukkit.Location;
 import org.bukkit.WorldBorder;
 import org.bukkit.entity.Player;
+
+import java.util.Optional;
 
 public class EventUtils {
 
@@ -21,7 +25,8 @@ public class EventUtils {
         border.setWarningDistance(0);
         border.setDamageBuffer(0);
         border.setDamageAmount(dmg);
-        border.setCenter(event.getSpawnLocation());
+        Optional<Location> opBorder = ConfigUtils.getInstance().getLocation(event.getConfigName() + "-border");
+        opBorder.ifPresent(border::setCenter);
     }
 
     public static void border(Event event, float minutes) {
