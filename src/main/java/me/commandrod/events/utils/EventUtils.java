@@ -6,7 +6,9 @@ import org.bukkit.Location;
 import org.bukkit.WorldBorder;
 import org.bukkit.entity.Player;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class EventUtils {
 
@@ -39,5 +41,9 @@ public class EventUtils {
         int ogSize = (int) event.getSpawnLocation().getWorld().getWorldBorder().getSize();
         int size = ogSize > 10000 ? 200 : ogSize;
         return "&7בורדר: &b" + size;
+    }
+
+    public static int random(int max) {
+        return ThreadLocalRandom.current().nextInt(max);
     }
 }

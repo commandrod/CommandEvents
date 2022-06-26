@@ -22,6 +22,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.reflections.Reflections;
 
+import java.lang.reflect.InvocationTargetException;
+
 public final class Main extends JavaPlugin {
 
     @Getter
@@ -31,7 +33,6 @@ public final class Main extends JavaPlugin {
     @Getter @Setter
     private static Event event;
 
-    @SneakyThrows
     public void onEnable() {
         this.saveDefaultConfig();
         plugin = this;
@@ -49,8 +50,14 @@ public final class Main extends JavaPlugin {
 
         final Reflections events = new Reflections("me.commandrod.events.events");
         for (Class<? extends Event> event : events.getSubTypesOf(Event.class)){
-            Event instance = event.getDeclaredConstructor().newInstance();
-            EventManager.getEvents().put((EventType) event.getMethod("getType").invoke(instance), instance);
+            Event instance = null;
+            try {
+                instance = event.getDeclaredConstructor().newInstance();
+            } catch (Exception ignored) { }
+            if (instance == null) continue;
+            try {
+                EventManager.getEvents().put((EventType) event.getMethod("getType").invoke(instance), instance);
+            } catch (Exception ignored) { }
         }
 
         this.getCommand("start").setExecutor(new Start());

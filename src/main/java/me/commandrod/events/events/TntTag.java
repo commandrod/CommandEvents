@@ -4,61 +4,52 @@ import me.commandrod.commandapi.cooldown.CommandCooldown;
 import me.commandrod.commandapi.items.ItemUtils;
 import me.commandrod.commandapi.utils.Utils;
 import me.commandrod.events.Main;
-import me.commandrod.events.api.event.Event;
 import me.commandrod.events.api.event.EventState;
 import me.commandrod.events.api.event.EventType;
-import me.commandrod.events.api.event.Handle;
+import me.commandrod.events.api.event.template.RoundEvent;
+import me.commandrod.events.utils.EventUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-public class TntTag extends Event {
+public class TntTag extends RoundEvent {
 
     private final List<Player> taggers;
     private final CommandCooldown cooldownManager;
-    private int time;
 
-    private final int defaultTime = 45;
-
-    private ItemStack tnt(){ return ItemUtils.quickItem(Material.TNT, "&cאתה התופס!", null, false); }
+    private ItemStack tnt() { return ItemUtils.quickItem(Material.TNT, "&cאתה התופס!", null, false); }
 
     public TntTag() {
-        super(EventType.TNTTAG, "התופס המתפוצץ");
+        super(EventType.TNTTAG, "התופס המתפוצץ", 45);
         this.taggers = new ArrayList<>();
         this.cooldownManager = new CommandCooldown(.3f, false);
-        this.time = defaultTime;
     }
 
-    public List<String> getLines(Player player) {
-        return Arrays.asList(
-                "&7זמן לפיצוץ: &b" + this.time,
+    public List<String> getExtraLines(Player player) {
+        return Collections.singletonList(
                 "&7מספר התופסים: &b" + this.taggers.size()
         );
     }
 
-    // Time Manager
-    public void activeEffect() {
-        if (this.time > 0) this.time--;
-        if (this.time != 0) return;
-        for (Player player : this.getPlayers().stream().filter(this.taggers::contains).collect(Collectors.toList()))
+    public void timeOver() {
+        for (Player player : this.getPlayers()
+                .stream()
+                .filter(this.taggers::contains)
+                .collect(Collectors.toList()))
             this.eliminate(player);
         this.randomTag();
     }
 
-    public void preEventStart() { for (Player player : this.getPlayers()) player.setGameMode(GameMode.ADVENTURE); }
+    public void timeRunning() { }
 
     public void onEventStart() { this.randomTag(); }
-
-    public void onEventEnd(Player winner) { this.taggers.clear(); }
 
     public boolean onDamageByPlayer(Player attacker, Player damaged) {
         if (!this.taggers.contains(attacker)) return true;
@@ -75,19 +66,18 @@ public class TntTag extends Event {
         player.getLocation().createExplosion(4f, false, false);
     }
 
-    public Handle onInventoryClick(Player clicker, InventoryClickEvent event) { return Handle.TRUE; }
-
     private void randomTag(){
         if (!this.getEventState().equals(EventState.PLAYING)) return;
-        this.time = this.defaultTime;
+        this.resetTime();
         int amount = Math.floorDiv(this.getPlayers().size(), 3);
         int finalAmount = Math.max(amount, 1);
         Bukkit.getScheduler().runTaskLater(Main.getPlugin(), () -> {
             for (int i = 0; i < finalAmount; i++){
-            List<Player> filtered = this.getPlayers().stream()
-                    .filter(p -> !this.taggers.contains(p))
+            List<Player> filtered = this.getPlayers()
+                    .stream()
+                    .filter(Predicate.not(this.taggers::contains))
                     .collect(Collectors.toList());
-            Player player = filtered.get(ThreadLocalRandom.current().nextInt(this.getPlayers().size() - 1));
+            Player player = filtered.get(EventUtils.random(this.getPlayers().size()));
             this.tag(player, null);
         }}, 50);
     }

@@ -32,7 +32,13 @@ public class Counter {
         this.getMap().put(player.getUniqueId(), amount);
     }
 
-    public void add(Player player){ set(player, this.getValue(player) + 1); }
+    public void add(Player player, int amount) {
+        set(player, this.getValue(player) + amount);
+    }
+
+    public void add(Player player) {
+        add(player, 1);
+    }
 
     public void printResults() {
         Bukkit.broadcast(Utils.color("&3" + this.getFriendlyName() + " Counter&7: "), "commandevents.admin");
