@@ -88,7 +88,7 @@ public class GoldenTail extends RoundEvent {
         CountPlayer.players.clear();
 
         Bukkit.getScheduler().runTaskLater(Main.getPlugin(), () -> {
-            for (int i = 0; i < this.getAmount(); i++){
+            for (int i = 0; i < this.getAmount(); i++) {
                 List<Player> filtered = this.getPlayers()
                         .stream()
                         .filter(Predicate.not(this.taggers::contains))

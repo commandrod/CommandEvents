@@ -41,15 +41,15 @@ public class EventListener implements Listener {
     }
 
     @EventHandler
-    public void onClick(InventoryClickEvent e){
+    public void onClick(InventoryClickEvent e) {
         if (!EventManager.isEventRunning()) return;
         if (!(e.getWhoClicked() instanceof Player p)) return;
         if (e.getClickedInventory() == null) return;
         if (!e.getClickedInventory().equals(p.getInventory())) return;
         if (e.getCurrentItem() == null) return;
         Event event = Main.getEvent();
-        if (event.isDead(p)){
-            if (p.hasPermission("commandevents.bypass")){
+        if (event.isDead(p)) {
+            if (p.hasPermission("commandevents.bypass")) {
                 e.setCancelled(false);
                 return;
             }
@@ -61,7 +61,7 @@ public class EventListener implements Listener {
     }
 
     @EventHandler
-    public void onChange(PlayerChangedWorldEvent e){
+    public void onChange(PlayerChangedWorldEvent e) {
         if (!EventManager.isEventRunning()) return;
         Event event = Main.getEvent();
         Player p = e.getPlayer();
@@ -135,7 +135,7 @@ public class EventListener implements Listener {
         if (!EventManager.isEventRunning()) return;
         if (!e.getEntityType().equals(EntityType.PLAYER)) return;
         if (e.getCause().name().contains("ENTITY")) return;
-        if (e.getCause().equals(EntityDamageEvent.DamageCause.CUSTOM) || e.getCause().equals((EntityDamageEvent.DamageCause.VOID))){
+        if (e.getCause().equals(EntityDamageEvent.DamageCause.CUSTOM) || e.getCause().equals((EntityDamageEvent.DamageCause.VOID))) {
             e.setCancelled(false);
             return;
         }
@@ -177,6 +177,5 @@ public class EventListener implements Listener {
         p.getInventory().clear();
         p.teleport(event.getSpawnLocation());
         p.setGameMode(GameMode.SPECTATOR);
-        event.onRespawn(p);
     }
 }

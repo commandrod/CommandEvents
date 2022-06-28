@@ -66,13 +66,13 @@ public class TntTag extends RoundEvent {
         player.getLocation().createExplosion(4f, false, false);
     }
 
-    private void randomTag(){
+    private void randomTag() {
         if (!this.getEventState().equals(EventState.PLAYING)) return;
         this.resetTime();
         int amount = Math.floorDiv(this.getPlayers().size(), 3);
         int finalAmount = Math.max(amount, 1);
         Bukkit.getScheduler().runTaskLater(Main.getPlugin(), () -> {
-            for (int i = 0; i < finalAmount; i++){
+            for (int i = 0; i < finalAmount; i++) {
             List<Player> filtered = this.getPlayers()
                     .stream()
                     .filter(Predicate.not(this.taggers::contains))
@@ -82,19 +82,19 @@ public class TntTag extends RoundEvent {
         }}, 50);
     }
 
-    private void untag(Player player){
+    private void untag(Player player) {
         this.taggers.remove(player);
         player.getInventory().clear();
     }
 
-    private void tag(Player player, Player attacker){
+    private void tag(Player player, Player attacker) {
         if (this.taggers.contains(player)) return;
         this.taggers.add(player);
-        for (int i = 0; i < 9; i++){
+        for (int i = 0; i < 9; i++) {
             player.getInventory().setItem(i, tnt());
         }
         player.getInventory().setHelmet(tnt());
-        if (attacker == null){
+        if (attacker == null) {
             Bukkit.broadcast(Utils.color("&7" + player.getName() + " has been tagged!"));
             return;
         }

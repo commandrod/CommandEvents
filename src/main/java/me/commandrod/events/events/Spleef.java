@@ -42,7 +42,7 @@ public class Spleef extends Event {
         this.spleefShovel = spleefer;
     }
 
-    public List<String> getLines(Player player){
+    public List<String> getLines(Player player) {
         return Arrays.asList(
                 "&7בלוקים שהרסת: &b" + this.getBlocksCounter().getValue(player),
                 "&7כדורי שלג שזרקת: &b" + this.getSnowballCounter().getValue(player),
@@ -69,10 +69,10 @@ public class Spleef extends Event {
         return false;
     }
 
-    public void activeEffect(){
+    public void activeEffect() {
         if (!EventManager.isEventRunning()) return;
         if (this.getPlayers().size() == 0) return;
-        for (Player player : this.getPlayers()){
+        for (Player player : this.getPlayers()) {
             if (player.getLocation().getBlock().getType().equals(Material.WATER)) this.eliminate(player);
         }
     }

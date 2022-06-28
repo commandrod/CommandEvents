@@ -29,12 +29,12 @@ import java.util.stream.Collectors;
 public class Start implements CommandExecutor, TabCompleter {
 
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-        if (cmd.getName().equalsIgnoreCase("start")){
-            if (!sender.hasPermission("commandevents.start")){
+        if (cmd.getName().equalsIgnoreCase("start")) {
+            if (!sender.hasPermission("commandevents.start")) {
                 sender.sendMessage(MessageUtils.PERM);
                 return true;
             }
-            if (args.length == 0){
+            if (args.length == 0) {
                 MessageUtils.cmdUsage(cmd, sender);
                 return true;
             }
@@ -43,25 +43,25 @@ public class Start implements CommandExecutor, TabCompleter {
                 return true;
             }
             String eventName = args[0].toUpperCase();
-            if (!EventManager.doesExist(eventName)){
+            if (!EventManager.doesExist(eventName)) {
                 sender.sendMessage(Utils.color("&cThe provided event is invalid!"));
                 return true;
             }
             EventType eventType = EventType.valueOf(eventName);
             Collection<Player> readyPlayers = Bukkit.getOnlinePlayers().stream().filter(player -> player.getGameMode().equals(GameMode.SURVIVAL) || player.getGameMode().equals(GameMode.ADVENTURE)).collect(Collectors.toList());
-            if (readyPlayers.size() < 2){
+            if (readyPlayers.size() < 2) {
                 sender.sendMessage(Utils.color("&cThere are not enough online players!"));
                 return true;
             }
             int seconds;
-            if (args.length == 1){
+            if (args.length == 1) {
                 seconds = 15;
             } else {
                 seconds = StringUtils.isNumeric(args[1]) ? Integer.parseInt(args[1]) : 15;
             }
             Main.setEvent(EventManager.getEvent(eventType));
             Event event = Main.getEvent();
-            if (event.getSpawnLocation() == null){
+            if (event.getSpawnLocation() == null) {
                 sender.sendMessage(Utils.color("&cThe start location of this event is invalid!"));
                 return true;
             }
@@ -76,10 +76,10 @@ public class Start implements CommandExecutor, TabCompleter {
             if (!sender.hasPermission("commandevents.start")) return Collections.EMPTY_LIST;
             final List<String> oneArgList = new ArrayList<>();
             final List<String> completions = new ArrayList<>();
-            for (EventType type : EventType.values()){
+            for (EventType type : EventType.values()) {
                 if (EventManager.getEvents().containsKey(type)) oneArgList.add(type.name().toUpperCase());
             }
-            if (args.length == 1){
+            if (args.length == 1) {
                 StringUtil.copyPartialMatches(args[0], oneArgList, completions);
             }
             Collections.sort(completions);
@@ -97,13 +97,13 @@ public class Start implements CommandExecutor, TabCompleter {
 //            return;
 //        }
 //        Collection<Player> readyPlayers = Bukkit.getOnlinePlayers().stream().filter(player -> player.getGameMode().equals(GameMode.SURVIVAL) || player.getGameMode().equals(GameMode.ADVENTURE)).collect(Collectors.toList());
-//        if (readyPlayers.size() < 2){
+//        if (readyPlayers.size() < 2) {
 //            sender.sendMessage(Utils.color("&cThere are not enough online players!"));
 //            return;
 //        }
 //        Main.setEvent(EventManager.getEvent(eventType));
 //        Event event = Main.getEvent();
-//        if (event.getSpawnLocation() == null){
+//        if (event.getSpawnLocation() == null) {
 //            sender.sendMessage(Utils.color("&cThe start location of this event is invalid!"));
 //            return;
 //        }

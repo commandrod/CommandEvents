@@ -14,17 +14,17 @@ public class Counter {
     private final HashMap<UUID, Integer> map;
     private final String friendlyName;
 
-    public Counter(String friendlyName){
+    public Counter(String friendlyName) {
         this.map = new HashMap<>();
         this.friendlyName = friendlyName;
     }
 
-    public int getValue(Player player){
+    public int getValue(Player player) {
         if (!this.getMap().containsKey(player.getUniqueId())) this.getMap().put(player.getUniqueId(), 0);
         return this.getMap().get(player.getUniqueId());
     }
 
-    public void set(Player player, int amount){
+    public void set(Player player, int amount) {
         if (this.getMap().containsKey(player.getUniqueId())){
             this.getMap().replace(player.getUniqueId(), amount);
             return;

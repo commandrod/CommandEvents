@@ -40,7 +40,7 @@ public class Simon extends Event {
     }
 
     public boolean onDamageByPlayer(Player attacker, Player damaged) {
-        if (attacker.getUniqueId().equals(this.king.getUniqueId())){
+        if (attacker.getUniqueId().equals(this.king.getUniqueId())) {
             this.eliminate(damaged);
             return true;
         }

@@ -62,7 +62,7 @@ public class FFA extends Event {
     public boolean onDamageByPlayer(Player attacker, Player damaged) { return !this.getEventState().equals(EventState.PLAYING); }
     public boolean onDamage(Player player, EntityDamageEvent event) { return event.getCause().equals(EntityDamageEvent.DamageCause.FALL); }
 
-    private Optional<ItemStack> goldenHead(Player owner){
+    private Optional<ItemStack> goldenHead(Player owner) {
         Optional<CommandItem> opItem = CommandItem.from("GOLDEN_HEAD");
         if (opItem.isEmpty()) return Optional.empty();
         ItemStack itemStack = ItemUtils.giveItem(owner, opItem.get(), "KILL", 1, false);

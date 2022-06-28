@@ -53,14 +53,14 @@ public class Waterdrop extends Event {
     }
 
     public void activeEffect() {
-        for (Player player : this.getPlayers()){
+        for (Player player : this.getPlayers()) {
             if (this.passedPlayers.contains(player)) continue;
             if (player.getLocation().getY() > this.blocks.get(0).getY() - 8) continue;
             Bukkit.broadcast(Utils.color("&7" + player.getName() + " passed!"));
             this.passedPlayers.add(player);
         }
         if (this.time > 0) this.time--;
-        if (this.time == 0 || (this.passedPlayers.size() == this.getPlayers().size())){
+        if (this.time == 0 || (this.passedPlayers.size() == this.getPlayers().size())) {
             this.getPlayers().stream().filter(player -> player != null && !this.passedPlayers.contains(player)).forEach(this::eliminate);
             this.newRound();
         }
@@ -98,16 +98,16 @@ public class Waterdrop extends Event {
         int amount = Math.min(this.round * 5 + 7, this.blocks.size());
         for (int i = 0; i < amount - 1; i++) {
             Block selectedBlock = this.blocks.get(rand.nextInt(this.blocks.size()));
-            if (selectedBlocks.contains(selectedBlock)){
+            if (selectedBlocks.contains(selectedBlock)) {
                 i--;
                 continue;
             }
             selectedBlocks.add(selectedBlock);
         }
-        for (Block block : this.blocks){
+        for (Block block : this.blocks) {
             block.setType(Material.AIR);
         }
-        for (Block block : selectedBlocks){
+        for (Block block : selectedBlocks) {
             block.setType(Material.RED_CONCRETE);
         }
         this.passedPlayers.clear();

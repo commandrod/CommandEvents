@@ -45,7 +45,7 @@ public abstract class Event implements AbstractEvent {
 
     private HashMap<NamedTextColor, Team> teams;
 
-    public Event(EventType type, String friendlyName, int activeEffectTime){
+    public Event(EventType type, String friendlyName, int activeEffectTime) {
         this.type = type;
         this.players = new ArrayList<>();
         this.eventState = EventState.LOBBY;
@@ -59,7 +59,7 @@ public abstract class Event implements AbstractEvent {
         this.teams = new HashMap<>();
     }
 
-    public Event(EventType type, String friendlyName){
+    public Event(EventType type, String friendlyName) {
         this(type, friendlyName, 20);
     }
 
@@ -137,7 +137,8 @@ public abstract class Event implements AbstractEvent {
         Bukkit.broadcast(Utils.color("&b" + player.getName() + " &fhas been eliminated by &b" + player.getKiller().getName() + "&f."));
     }
 
-    public void revive(Player player){
+    public void revive(Player player) {
+        this.onRespawn(player);
         this.setup(player);
         this.players.add(player);
         player.teleport(this.getSpawnLocation());
@@ -147,7 +148,7 @@ public abstract class Event implements AbstractEvent {
             this.sendScoreboard(players);
     }
 
-    public void lobby(){
+    public void lobby() {
         this.setEventState(EventState.LOBBY);
         for (Player player : Bukkit.getOnlinePlayers()) {
             player.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
@@ -159,7 +160,7 @@ public abstract class Event implements AbstractEvent {
         }
     }
 
-    public void stop(){
+    public void stop() {
         this.lobby();
         Bukkit.getScheduler().cancelTasks(Main.getPlugin());
     }
@@ -254,10 +255,10 @@ public abstract class Event implements AbstractEvent {
 
     public GameMode getDefaultGamemode() { return GameMode.ADVENTURE; }
 
-    public void setup(Player player) { }
+    public void setup(Player player) {}
     public List<String> getLines(Player player) { return null; }
     public void activeEffect() {}
-    public void preEventStart() { }
+    public void preEventStart() {}
     public void onEventStart() {}
     public void onEventEnd(Player winner) {}
     public void onDeath(Player player) {}

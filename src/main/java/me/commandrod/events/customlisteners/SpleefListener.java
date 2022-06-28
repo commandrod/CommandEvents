@@ -15,7 +15,7 @@ import org.bukkit.event.entity.ProjectileLaunchEvent;
 public class SpleefListener implements Listener {
 
     @EventHandler
-    public void onThrow(ProjectileLaunchEvent e){
+    public void onThrow(ProjectileLaunchEvent e) {
         if (!EventManager.isEventRunning()) return;
         if (!Main.getEvent().getType().equals(EventType.SPLEEF)) return;
         Spleef event = (Spleef) Main.getEvent();
@@ -24,7 +24,7 @@ public class SpleefListener implements Listener {
     }
 
     @EventHandler
-    public void onHit(ProjectileHitEvent e){
+    public void onHit(ProjectileHitEvent e) {
         if (!EventManager.isEventRunning()) return;
         if (!Main.getEvent().getType().equals(EventType.SPLEEF)) return;
         Spleef event = (Spleef) Main.getEvent();

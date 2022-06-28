@@ -13,11 +13,11 @@ public class EventManager {
     private static final HashMap<EventType, Event> events = new HashMap<>();
 
     @SneakyThrows
-    public static Event getEvent(EventType type){
+    public static Event getEvent(EventType type) {
         return events.get(type).getClass().getDeclaredConstructor().newInstance();
     }
 
-    public static boolean doesExist(String eventType){
+    public static boolean doesExist(String eventType) {
         return EventManager.getEvents().keySet()
                 .stream()
                 .map(EventType::name)
@@ -25,7 +25,7 @@ public class EventManager {
                 .contains(eventType.toUpperCase());
     }
 
-    public static boolean isEventRunning(){
+    public static boolean isEventRunning() {
         Event event = Main.getEvent();
         if (event == null) return false;
         return !event.getEventState().equals(EventState.LOBBY);

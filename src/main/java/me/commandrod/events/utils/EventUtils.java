@@ -15,7 +15,7 @@ import java.util.concurrent.ThreadLocalRandom;
 @UtilityClass
 public class EventUtils {
 
-    public void heal(Player player, boolean clear){
+    public void heal(Player player, boolean clear) {
         if (clear) player.getInventory().clear();
         player.setHealth(20);
         player.setFoodLevel(20);
