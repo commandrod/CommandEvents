@@ -12,6 +12,7 @@ import me.commandrod.events.api.event.EventType;
 import me.commandrod.events.api.event.Handle;
 import me.commandrod.events.api.event.template.RoundEvent;
 import me.commandrod.events.utils.EventUtils;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -42,9 +43,8 @@ public class GoldenTail extends RoundEvent {
         );
     }
 
-    public void preEventStart() {
-        for (Player player : this.getPlayers())
-            CountPlayer.from(player);
+    public void setup(Player player) {
+        CountPlayer.from(player);
     }
 
     public void timeRunning() {
@@ -102,17 +102,17 @@ public class GoldenTail extends RoundEvent {
 
     private void untag(Player player) {
         this.taggers.remove(player);
+        this.color(player, NamedTextColor.WHITE);
         player.getInventory().setLeggings(null);
         player.setGlowing(false);
-        this.changeName(player, "&f");
     }
 
     private void tag(Player player) {
         if (this.taggers.contains(player)) return;
+        this.color(player, NamedTextColor.GOLD);
         this.taggers.add(player);
         player.getInventory().setLeggings(leggings());
         player.setGlowing(true);
-        this.changeName(player, "&e");
     }
 
     private ItemStack leggings() {

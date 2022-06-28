@@ -46,9 +46,8 @@ public class ParkourTag extends Event {
         }
     }
 
-    public void preEventStart() {
-        for (Player player : this.getPlayers())
-            this.sendRole(player);
+    public void setup(Player player) {
+        this.sendRole(player);
     }
 
     public void onEventStart() { this.initPlayers(); }

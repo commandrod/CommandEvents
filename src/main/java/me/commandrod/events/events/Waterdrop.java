@@ -66,11 +66,12 @@ public class Waterdrop extends Event {
         }
     }
 
+    public void setup(Player player) {
+        player.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 20*10000, 0, false, false));
+        player.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 20*10000, 0, false, false));
+    }
+
     public void onEventStart() {
-        for (Player player : this.getPlayers()){
-            player.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 20*10000, 0, false, false));
-            player.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 20*10000, 0, false, false));
-        }
         this.newRound();
     }
 

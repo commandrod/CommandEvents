@@ -10,6 +10,7 @@ import me.commandrod.commandapi.utils.Utils;
 import me.commandrod.events.Main;
 import me.commandrod.events.listeners.ActiveEffectListener;
 import me.commandrod.events.utils.EventUtils;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -23,8 +24,10 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.Team;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -38,8 +41,9 @@ public abstract class Event implements AbstractEvent {
     private final int activeEffectTime;
     private final Event instance;
 
-    private Location spawnLocation;
     private EventState eventState;
+
+    private HashMap<NamedTextColor, Team> teams;
 
     public Event(EventType type, String friendlyName, int activeEffectTime){
         this.type = type;
@@ -52,12 +56,7 @@ public abstract class Event implements AbstractEvent {
         this.friendlyName = friendlyName;
         this.activeEffectTime = activeEffectTime;
         this.instance = this;
-        Optional<Location> opSpawn = ConfigUtils.getInstance().getLocation(this.configName + "-spawn-location");
-        if (opSpawn.isEmpty()) {
-            Main.getPlugin().getLogger().severe("Error getting spawn location for " + this.configName + "!");
-            return;
-        }
-        this.spawnLocation = opSpawn.get();
+        this.teams = new HashMap<>();
     }
 
     public Event(EventType type, String friendlyName){
@@ -65,26 +64,27 @@ public abstract class Event implements AbstractEvent {
     }
 
     public void spawn() {
-        for (Player player : this.players) player.teleport(this.spawnLocation);
+        for (Player player : this.players) player.teleport(this.getSpawnLocation());
     }
 
     public void countdown(int seconds) {
-        if (this.spawnLocation == null){
+        if (this.getSpawnLocation() == null){
             Bukkit.broadcast(Utils.color("&cAn error has occurred while trying to start this event!"), "commandevents.admin");
             return;
         }
 
         for (Player player : Bukkit.getOnlinePlayers()) {
-            player.teleport(this.spawnLocation);
+            player.teleport(this.getSpawnLocation());
             if (player.getGameMode().equals(GameMode.CREATIVE) || player.getGameMode().equals(GameMode.SPECTATOR)) continue;
             this.players.add(player);
             this.sendScoreboard(player);
-            player.setGameMode(GameMode.ADVENTURE);
-            player.playerListName(Utils.color("&a" + player.getName()));
+            player.setGameMode(this.getDefaultGamemode());
+            this.color(player, NamedTextColor.WHITE);
+            this.setup(player);
         }
 
-        WorldBorder border = this.spawnLocation.getWorld().getWorldBorder();
-        border.setSize(5000);
+        WorldBorder border = this.getSpawnLocation().getWorld().getWorldBorder();
+        border.reset();
         this.preEventStart();
 
         AtomicInteger countdown = new AtomicInteger(seconds);
@@ -127,7 +127,7 @@ public abstract class Event implements AbstractEvent {
         player.showTitle(Utils.toTitle("&cYou died!", "", 10, 60, 10));
         this.players.remove(player);
         this.onDeath(player);
-        player.teleport(this.spawnLocation);
+        player.teleport(this.getSpawnLocation());
         this.players.forEach(this::sendScoreboard);
         this.end();
         if (player.getKiller() == null){
@@ -138,26 +138,25 @@ public abstract class Event implements AbstractEvent {
     }
 
     public void revive(Player player){
+        this.setup(player);
         this.players.add(player);
-        player.sendMessage(Utils.color("&3You have been revived."));
-        player.teleport(this.spawnLocation);
-        player.setGameMode(GameMode.SURVIVAL);
+        player.teleport(this.getSpawnLocation());
+        player.setGameMode(this.getDefaultGamemode());
         EventUtils.heal(player, false);
-        for (Player players : this.players) {
+        for (Player players : this.players)
             this.sendScoreboard(players);
-        }
     }
 
     public void lobby(){
         this.setEventState(EventState.LOBBY);
-        Bukkit.getOnlinePlayers().forEach(player -> {
+        for (Player player : Bukkit.getOnlinePlayers()) {
             player.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
             EventUtils.heal(player, true);
             player.setGameMode(GameMode.SURVIVAL);
             Optional<Location> opSpawn = ConfigUtils.getInstance().getLocation("spawn");
             opSpawn.ifPresentOrElse(player::teleport,
                     () -> player.sendMessage(Utils.color(MessageUtils.ERROR_ADMIN)));
-        });
+        }
     }
 
     public void stop(){
@@ -202,6 +201,26 @@ public abstract class Event implements AbstractEvent {
         }, 20*3);
     }
 
+    public void color(Player player, NamedTextColor color) {
+        Scoreboard sb = Bukkit.getScoreboardManager().getMainScoreboard();
+        Team team;
+        if (!this.teams.containsKey(color)) {
+            String name = color.toString().toLowerCase();
+            team = sb.getTeam(name);
+            if (team == null) {
+                team = sb.registerNewTeam(name);
+                team.color(color);
+            }
+        } else {
+            team = this.teams.get(color);
+        }
+        Team oldTeam = sb.getEntryTeam(player.getName());
+        if (oldTeam != null) {
+            oldTeam.removeEntry(player.getName());
+        }
+        team.addEntry(player.getName());
+    }
+
     public void sendScoreboard(Player player) {
         Scoreboard scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
         Objective obj = scoreboard.registerNewObjective("gamesb", "dummy", Utils.color("&b&lActive Events"));
@@ -224,6 +243,18 @@ public abstract class Event implements AbstractEvent {
         return !this.players.contains(player);
     }
 
+    public Location getSpawnLocation() {
+        Optional<Location> opSpawn = ConfigUtils.getInstance().getLocation(this.configName + "-spawn-location");
+        if (opSpawn.isEmpty()) {
+            Main.getPlugin().getLogger().severe("Error getting spawn location for " + this.configName + "!");
+            return null;
+        }
+        return opSpawn.get();
+    }
+
+    public GameMode getDefaultGamemode() { return GameMode.ADVENTURE; }
+
+    public void setup(Player player) { }
     public List<String> getLines(Player player) { return null; }
     public void activeEffect() {}
     public void preEventStart() { }

@@ -1,5 +1,7 @@
 package me.commandrod.events.api.event;
 
+import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -21,6 +23,7 @@ public interface AbstractEvent {
     void stop();
     void end();
     void winner(Player winner);
+    void color(Player player, NamedTextColor color);
     void sendScoreboard(Player player);
     boolean isDead(Player player);
 
@@ -31,7 +34,7 @@ public interface AbstractEvent {
     int getActiveEffectTime();
 
     Location getSpawnLocation();
-    void setSpawnLocation(Location spawnLocation);
+    GameMode getDefaultGamemode();
     EventState getEventState();
     void setEventState(EventState eventState);
 

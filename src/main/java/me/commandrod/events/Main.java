@@ -3,8 +3,10 @@ package me.commandrod.events;
 import cloud.commandframework.annotations.AnnotationParser;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.SneakyThrows;
 import me.commandrod.commandapi.CommandAPI;
+import me.commandrod.commandapi.utils.ConfigUtils;
+import me.commandrod.commandapi.utils.MessageUtils;
+import me.commandrod.commandapi.utils.Utils;
 import me.commandrod.events.api.event.Event;
 import me.commandrod.events.api.event.EventManager;
 import me.commandrod.events.api.event.EventType;
@@ -15,14 +17,19 @@ import me.commandrod.events.commands.Stop;
 import me.commandrod.events.customlisteners.SnowDodgeListener;
 import me.commandrod.events.customlisteners.SpleefListener;
 import me.commandrod.events.listeners.EventListener;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.GameRule;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.Team;
 import org.reflections.Reflections;
 
-import java.lang.reflect.InvocationTargetException;
+import java.util.Optional;
 
 public final class Main extends JavaPlugin {
 
@@ -49,7 +56,7 @@ public final class Main extends JavaPlugin {
         annotationParser.parse(new Revive());
 
         final Reflections events = new Reflections("me.commandrod.events.events");
-        for (Class<? extends Event> event : events.getSubTypesOf(Event.class)){
+        for (Class<? extends Event> event : events.getSubTypesOf(Event.class)) {
             Event instance = null;
             try {
                 instance = event.getDeclaredConstructor().newInstance();
@@ -72,5 +79,16 @@ public final class Main extends JavaPlugin {
         }
 
         Bukkit.getPluginManager().registerEvents(new EventListener(), this);
+
+        final Scoreboard sb = Bukkit.getScoreboardManager().getMainScoreboard();
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            Optional<Location> opSpawn = ConfigUtils.getInstance().getLocation("spawn");
+            opSpawn.ifPresentOrElse(player::teleport,
+                    () -> player.sendMessage(Utils.color(MessageUtils.ERROR_ADMIN)));
+            final String entry = player.getName();
+            final Team team = sb.getEntryTeam(entry);
+            if (team == null) continue;
+            team.removeEntry(entry);
+        }
     }
 }

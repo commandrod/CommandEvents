@@ -34,16 +34,14 @@ public class FFA extends Event {
         );
     }
 
-    public void preEventStart() {
-        for (Player player : this.getPlayers()) {
-            player.getInventory().addItem(new ItemStack(Material.DIAMOND_AXE));
-            player.getInventory().addItem(new ItemStack(Material.COOKED_BEEF, 4));
-            player.getInventory().setItemInOffHand(new ItemStack(Material.SHIELD));
-            player.getInventory().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
-            player.getInventory().setChestplate(new ItemStack(Material.DIAMOND_CHESTPLATE));
-            player.getInventory().setLeggings(new ItemStack(Material.DIAMOND_LEGGINGS));
-            player.getInventory().setBoots(new ItemStack(Material.DIAMOND_BOOTS));
-        }
+    public void setup(Player player) {
+        player.getInventory().addItem(new ItemStack(Material.DIAMOND_AXE));
+        player.getInventory().addItem(new ItemStack(Material.COOKED_BEEF, 4));
+        player.getInventory().setItemInOffHand(new ItemStack(Material.SHIELD));
+        player.getInventory().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
+        player.getInventory().setChestplate(new ItemStack(Material.DIAMOND_CHESTPLATE));
+        player.getInventory().setLeggings(new ItemStack(Material.DIAMOND_LEGGINGS));
+        player.getInventory().setBoots(new ItemStack(Material.DIAMOND_BOOTS));
     }
 
     public void onEventStart() { EventUtils.border(this, 2, 2); }

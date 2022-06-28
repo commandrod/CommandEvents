@@ -101,14 +101,6 @@ public class EventListener implements Listener {
         Player p = e.getPlayer();
         if (!EventManager.isEventRunning()) return;
         Event event = Main.getEvent();
-//        if (event.isDead(p)){
-//            if (p.hasPermission("commandevents.bypass")){
-//                e.setCancelled(false);
-//                return;
-//            }
-//            e.setCancelled(true);
-//            return;
-//        }
         e.setDropItems(false);
         e.setCancelled(event.onBreakBlock(e, p, e.getBlock()));
     }
@@ -118,14 +110,6 @@ public class EventListener implements Listener {
         Player p = e.getPlayer();
         if (!EventManager.isEventRunning()) return;
         Event event = Main.getEvent();
-//        if (event.isDead(p)){
-//            if (p.hasPermission("commandevents.bypass")){
-//                e.setCancelled(false);
-//                return;
-//            }
-//            e.setCancelled(true);
-//            return;
-//        }
         e.setCancelled(event.onPlaceBlock(e, p, e.getBlock(), e.getBlockReplacedState().getBlock()));
     }
 
@@ -167,6 +151,8 @@ public class EventListener implements Listener {
     @EventHandler(priority = EventPriority.HIGH)
     public void onDrop(PlayerDropItemEvent e) {
         if (!EventManager.isEventRunning()) return;
+        Event event = Main.getEvent();
+        if (event.isDead(e.getPlayer())) return;
         e.setCancelled(true);
     }
 

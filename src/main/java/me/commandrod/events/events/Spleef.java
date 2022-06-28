@@ -50,9 +50,8 @@ public class Spleef extends Event {
         );
     }
 
-    public void preEventStart() {
-        this.getPlayers().forEach(player -> player.getInventory().addItem(getSpleefShovel()));
-        this.getSpawnLocation().getWorld().getWorldBorder().reset();
+    public void setup(Player player) {
+        player.getInventory().addItem(getSpleefShovel());
     }
 
     public void onEventStart() {

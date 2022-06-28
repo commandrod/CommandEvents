@@ -10,5 +10,6 @@ public enum EventType {
     SIMON,
     SNOWDODGE,
     GOLDENTAIL,
-    FALLGUYS
+    FALLGUYS,
+    KOTH
 }

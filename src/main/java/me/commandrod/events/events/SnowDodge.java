@@ -52,17 +52,15 @@ public class SnowDodge extends Event {
 
     public void activeEffect() {
         for (Player player : this.getPlayers()) {
-            Block block = player.getLocation().getBlock().getRelative(BlockFace.DOWN);
-            if (!block.getType().equals(Material.LIME_WOOL)) continue;
+            if (!EventUtils.blockUnderIs(player, Material.LIME_WOOL)) continue;
             if (player.getHealth() >= 20) continue;
             SoundUtils.playSound(player, Sound.ENTITY_EXPERIENCE_ORB_PICKUP);
             player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 21, 2, false, false));
         }
     }
 
-    public void preEventStart() {
-        for (Player player : this.getPlayers())
-            player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 2000000, 2, false, false));
+    public void setup(Player player) {
+        player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 2000000, 2, false, false));
     }
 
     public void onEventStart() {
